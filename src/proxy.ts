@@ -25,7 +25,22 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const isAuthPage = pathname.startsWith("/auth");
+  const isAppPage =
+    pathname.startsWith("/bookmarks") || pathname.startsWith("/todos");
+
+  if (!user && isAppPage) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  if (user && isAuthPage) {
+    return NextResponse.redirect(new URL("/bookmarks", request.url));
+  }
 
   return supabaseResponse;
 }
