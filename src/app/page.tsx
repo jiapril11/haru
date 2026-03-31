@@ -1,9 +1,9 @@
-import Image from "next/image";
+import AppLayout from '@/components/layout/AppLayout';
 
 export default function Home() {
   return (
-    <main>
-        <h1>haru</h1>
-    </main>
+    <AppLayout>
+      <h1 className="text-2xl font-bold">Hello This is Haru</h1>
+    </AppLayout>
   );
 }
