@@ -1,6 +1,6 @@
 "use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menus = [
@@ -12,16 +12,16 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-14 left-0 w-56 h-[calc(100vh-3.5rem)] bg-[#1a1a2e] border-r border-white/10 p-4">
+    <aside className="fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-56 border-r border-white/10 bg-[#1a1a2e] p-4">
       <nav className="flex flex-col gap-1">
         {menus.map((menu) => (
           <Link
             key={menu.href}
             href={menu.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
               pathname.startsWith(menu.href)
-                ? "bg-[#0f3460] text-white font-medium"
-                : "text-white/60 hover:text-white hover:bg-white/5"
+                ? "bg-[#0f3460] font-medium text-white"
+                : "text-white/60 hover:bg-white/5 hover:text-white"
             }`}
           >
             <span>{menu.icon}</span>
