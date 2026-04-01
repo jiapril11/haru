@@ -1,13 +1,34 @@
+"use client";
+
+import { createClient } from "@/lib/supabase/client";
 import { Bookmark } from "@/types";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type Props = {
   bookmark: Bookmark;
 };
 
 export default function BookmarkCard({ bookmark }: Props) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [isFavorite, setIsFavorite] = useState(bookmark.is_favorite);
+
+  async function handleFavorite() {
+    setIsFavorite((prev) => !prev);
+    await supabase
+      .from("bookmarks")
+      .update({ is_favorite: !isFavorite })
+      .eq("id", bookmark.id);
+  }
+
+  async function handleDelete() {
+    if (!confirm("북마크를 삭제할까요?")) return;
+    await supabase.from("bookmarks").delete().eq("id", bookmark.id);
+    router.refresh();
+  }
   return (
-    <div className="group rounded-xl border border-white/10 bg-[#16213e] p-4 transition-colors hover:border-white/20">
+    <div className="group flex flex-col rounded-xl border border-white/10 bg-[#16213e] p-4 transition-colors hover:border-white/20">
       <div className="mb-3 flex items-center gap-2">
         {bookmark.favicon_url ? (
           <img
@@ -18,12 +39,19 @@ export default function BookmarkCard({ bookmark }: Props) {
         ) : (
           <div className="h-4 w-4 rounded-sm bg-white/10" />
         )}
-        <span className="truncate text-xs text-white/30">
+        <span className="flex-1 truncate text-xs text-white/30">
           {new URL(bookmark.url).hostname}
         </span>
-        {bookmark.is_favorite && (
-          <span className="ml-auto text-xs text-yellow-400">★</span>
-        )}
+        <button
+          onClick={handleFavorite}
+          className={`cursor-pointer text-sm transition-colors ${
+            isFavorite
+              ? "text-yellow-400"
+              : "text-white/20 hover:text-yellow-400"
+          }`}
+        >
+          ★
+        </button>
       </div>
 
       <h3 className="mb-1 line-clamp-2 text-sm leading-relaxed font-medium text-white">
@@ -37,7 +65,7 @@ export default function BookmarkCard({ bookmark }: Props) {
       )}
 
       {bookmark.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
+        <div className="mt-2 flex flex-wrap gap-1">
           {bookmark.tags.map((tag) => (
             <span
               key={tag}
@@ -49,14 +77,22 @@ export default function BookmarkCard({ bookmark }: Props) {
         </div>
       )}
 
-      <a
-        href={bookmark.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 block text-xs text-[#e94560] opacity-0 transition-opacity group-hover:opacity-100"
-      >
-        열기 →
-      </a>
+      <div className="mt-auto flex items-center justify-between pt-3 opacity-0 transition-opacity group-hover:opacity-100">
+        <a
+          href={bookmark.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-[#e94560]"
+        >
+          열기 →
+        </a>
+        <button
+          onClick={handleDelete}
+          className="cursor-pointer text-xs text-white/20 transition-colors hover:text-[#e94560]"
+        >
+          삭제
+        </button>
+      </div>
     </div>
   );
 }
