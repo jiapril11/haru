@@ -18,7 +18,7 @@ export type Bookmark = {
   created_at: string;
 };
 
-export type todo = {
+export type Todo = {
   id: string;
   user_id: string;
   title: string;
