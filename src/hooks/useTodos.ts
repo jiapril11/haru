@@ -72,3 +72,18 @@ export function useDeleteTodo() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
   });
 }
+
+export function useUpdateTodoOrder() {
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+
+  return useMutation({
+    mutationFn: async (todos: Pick<Todo, "id" | "sort_order">[]) => {
+      const updates = todos.map(({ id, sort_order }) =>
+        supabase.from("todos").update({ sort_order }).eq("id", id),
+      );
+      await Promise.all(updates);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
+}

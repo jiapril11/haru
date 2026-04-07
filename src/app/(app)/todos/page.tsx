@@ -1,27 +1,74 @@
 "use client";
 
-import { useTodos } from "@/hooks/useTodos";
-import { filterByView, TodoView } from "@/lib/date";
 import { useState } from "react";
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { useTodos, useUpdateTodoOrder } from "@/hooks/useTodos";
+import { filterByView, TodoView } from "@/lib/date";
+import SortableTodoItem from "@/components/todo/SortableTodoItem";
 import TodoItem from "@/components/todo/TodoItem";
 import AddTodoForm from "@/components/todo/AddTodoForm";
+import Calendar from "@/components/todo/Calendar";
+import { format, isSameDay, parseISO } from "date-fns";
+import { ko } from "date-fns/locale";
 
-const tabs: { label: string; value: TodoView }[] = [
+type Tab = TodoView | "all" | "calendar";
+
+const tabs: { label: string; value: Tab }[] = [
   { label: "오늘", value: "today" },
   { label: "이번 주", value: "week" },
   { label: "이번 달", value: "month" },
+  { label: "전체", value: "all" },
+  { label: "달력", value: "calendar" },
 ];
+
 export default function TodosPage() {
   const { data: todos, isLoading } = useTodos();
-  const [view, setView] = useState<TodoView>("today");
-
-  const filtered = todos?.filter((t) => filterByView(t.due_date, view)) ?? [];
-  const done = filtered.filter((t) => t.is_done);
-  const undone = filtered.filter((t) => !t.is_done);
+  const updateOrder = useUpdateTodoOrder();
+  const [view, setView] = useState<Tab>("today");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const today = format(new Date(), "yyyy년 M월 d일 EEEE", { locale: ko });
+
+  const filtered =
+    view === "calendar"
+      ? []
+      : view === "all"
+        ? (todos ?? [])
+        : (todos?.filter((t) => filterByView(t.due_date, view)) ?? []);
+
+  const undone = filtered.filter((t) => !t.is_done);
+  const done = filtered.filter((t) => t.is_done);
+
+  const calendarTodos = selectedDate
+    ? (todos?.filter(
+        (t) => t.due_date && isSameDay(parseISO(t.due_date), selectedDate),
+      ) ?? [])
+    : [];
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = undone.findIndex((t) => t.id === active.id);
+    const newIndex = undone.findIndex((t) => t.id === over.id);
+    const reordered = arrayMove(undone, oldIndex, newIndex);
+    updateOrder.mutate(
+      reordered.map((todo, index) => ({ id: todo.id, sort_order: index })),
+    );
+  }
+
   return (
     <div className="max-w-2xl">
       {/* 헤더 */}
@@ -51,14 +98,52 @@ export default function TodosPage() {
         <p className="py-12 text-center text-sm text-white/30">
           불러오는 중...
         </p>
+      ) : view === "calendar" ? (
+        /* ── 달력 뷰 ── */
+        <div className="flex flex-col gap-4">
+          <Calendar
+            todos={todos ?? []}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+          />
+          {selectedDate && (
+            <div>
+              <p className="mb-2 text-xs text-white/40">
+                {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
+                {calendarTodos.length}개
+              </p>
+              {calendarTodos.length === 0 ? (
+                <p className="py-6 text-center text-sm text-white/20">
+                  할일이 없어요
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {calendarTodos.map((todo) => (
+                    <TodoItem key={todo.id} todo={todo} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
+        /* ── 목록 뷰 ── */
         <div className="flex flex-col gap-2">
-          {/* 미완료 */}
-          {undone.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} />
-          ))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={undone.map((t) => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {undone.map((todo) => (
+                <SortableTodoItem key={todo.id} todo={todo} />
+              ))}
+            </SortableContext>
+          </DndContext>
 
-          {/* 추가 폼 */}
           <AddTodoForm />
 
           {done.length > 0 && (
@@ -70,7 +155,6 @@ export default function TodosPage() {
             </div>
           )}
 
-          {/* 빈 상태 */}
           {filtered.length === 0 && (
             <div className="py-16 text-center">
               <p className="mb-3 text-3xl">✅</p>
