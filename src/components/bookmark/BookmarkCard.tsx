@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { Bookmark } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -12,6 +13,7 @@ type Props = {
 export default function BookmarkCard({ bookmark }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const queryClient = useQueryClient();
   const [isFavorite, setIsFavorite] = useState(bookmark.is_favorite);
 
   async function handleFavorite() {
@@ -25,7 +27,7 @@ export default function BookmarkCard({ bookmark }: Props) {
   async function handleDelete() {
     if (!confirm("북마크를 삭제할까요?")) return;
     await supabase.from("bookmarks").delete().eq("id", bookmark.id);
-    router.refresh();
+    queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
   }
   return (
     <div className="group flex flex-col rounded-xl border border-white/10 bg-[#16213e] p-4 transition-colors hover:border-white/20">

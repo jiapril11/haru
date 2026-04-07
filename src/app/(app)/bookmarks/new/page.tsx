@@ -1,12 +1,14 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function NewBookmarkPage() {
   const router = useRouter();
   const supabase = createClient();
+  const queryClient = useQueryClient();
 
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
@@ -59,6 +61,7 @@ export default function NewBookmarkPage() {
     if (error) {
       setError(error.message);
     } else {
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
       router.push("/bookmarks");
     }
 

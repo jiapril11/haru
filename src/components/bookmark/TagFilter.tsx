@@ -12,12 +12,13 @@ export default function TagFilter({ tags }: Props) {
   const activeTag = searchParams.get("tag");
 
   function handleTag(tag: string) {
-    console.log(tag);
+    const params = new URLSearchParams(searchParams.toString());
     if (activeTag === tag) {
-      router.push("/bookmarks"); // 같은 태그 누르면 해제
+      params.delete("tag");
     } else {
-      router.push(`/bookmarks?tag=${encodeURIComponent(tag)}`);
+      params.set("tag", tag);
     }
+    router.push(`/bookmarks?${params.toString()}`);
   }
 
   if (tags.length === 0) return null;
