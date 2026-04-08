@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Todo } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-async function fetchTodos(): Promise<todo[]> {
+async function fetchTodos(): Promise<Todo[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("todos")
