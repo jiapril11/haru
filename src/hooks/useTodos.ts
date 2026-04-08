@@ -29,7 +29,9 @@ export function useAddTodo() {
   const supabase = createClient();
 
   return useMutation({
-    mutationFn: async (todo: Pick<Todo, "title" | "priority" | "due_date">) => {
+    mutationFn: async (
+      todo: Pick<Todo, "title" | "priority" | "due_date" | "start_date">,
+    ) => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -85,5 +87,57 @@ export function useUpdateTodoOrder() {
       await Promise.all(updates);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
+}
+
+export function useDailyChecks(todoId: string) {
+  const supabase = createClient();
+  return useQuery({
+    queryKey: ["daily_checks", todoId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("todo_daily_checks")
+        .select("*")
+        .eq("todo_id", todoId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useToggleDailyCheck() {
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+
+  return useMutation({
+    mutationFn: async ({
+      todoId,
+      date,
+      checked,
+    }: {
+      todoId: string;
+      date: string;
+      checked: boolean;
+    }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("로그인이 필요합니다.");
+
+      if (checked) {
+        await supabase
+          .from("todo_daily_checks")
+          .delete()
+          .eq("todo_id", todoId)
+          .eq("date", date);
+      } else {
+        await supabase
+          .from("todo_daily_checks")
+          .insert({ todo_id: todoId, user_id: user.id, date });
+      }
+    },
+    onSuccess: (_, { todoId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily_checks", todoId] });
+    },
   });
 }

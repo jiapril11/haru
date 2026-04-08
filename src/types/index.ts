@@ -25,6 +25,14 @@ export type Todo = {
   is_done: boolean;
   priority: "high" | "medium" | "low";
   due_date: string | null;
+  start_date: string | null;
   sort_order: number;
   created_at: string;
+};
+
+export type TodoDailyCheck = {
+  id: string;
+  todo_id: string;
+  user_id: string;
+  date: string;
 };

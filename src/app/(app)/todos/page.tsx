@@ -47,7 +47,8 @@ export default function TodosPage() {
       ? []
       : view === "all"
         ? (todos ?? [])
-        : (todos?.filter((t) => filterByView(t.due_date, view)) ?? []);
+        : (todos?.filter((t) => filterByView(t.due_date, view, t.start_date)) ??
+          []);
 
   const undone = filtered.filter((t) => !t.is_done);
   const done = filtered.filter((t) => t.is_done);
