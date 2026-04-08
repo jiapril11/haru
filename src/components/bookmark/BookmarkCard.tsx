@@ -79,7 +79,7 @@ export default function BookmarkCard({ bookmark }: Props) {
         </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-3 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="mt-auto flex items-center justify-between pt-3 transition-opacity md:opacity-0 md:group-hover:opacity-100">
         <a
           href={bookmark.url}
           target="_blank"

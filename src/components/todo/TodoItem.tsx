@@ -76,7 +76,7 @@ export default function TodoItem({ todo }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] opacity-0 transition-colors group-hover:opacity-100 hover:text-[#e94560]"
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors md:opacity-0 md:group-hover:opacity-100 hover:text-[#e94560]"
         >
           삭제
         </button>

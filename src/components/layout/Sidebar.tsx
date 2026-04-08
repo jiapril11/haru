@@ -12,7 +12,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-56 border-r border-[var(--border)] bg-[var(--surface2)] p-4">
+    <aside className="fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-56 border-r border-[var(--border)] bg-[var(--surface2)] p-4 hidden md:block">
       <nav className="flex flex-col gap-1">
         {menus.map((menu) => (
           <Link

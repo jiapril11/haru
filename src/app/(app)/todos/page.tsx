@@ -71,7 +71,7 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="w-full max-w-2xl">
       {/* 헤더 */}
       <div className="mt-4 mb-6">
         <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>
@@ -84,7 +84,7 @@ export default function TodosPage() {
           <button
             key={tab.value}
             onClick={() => setView(tab.value)}
-            className={`flex-1 cursor-pointer rounded-lg py-2 text-sm transition-colors ${
+            className={`flex-1 cursor-pointer rounded-lg py-2 text-xs md:text-sm transition-colors ${
               view === tab.value
                 ? "bg-[var(--accent)] font-medium text-white"
                 : "text-[var(--text-subtle)] hover:text-[var(--text)]"

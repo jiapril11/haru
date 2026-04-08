@@ -25,7 +25,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       {/* 네비게이션 */}
-      <nav className="flex items-center justify-between border-b border-white/5 px-8 py-5">
+      <nav className="flex items-center justify-between border-b border-white/5 px-4 py-4 md:px-8 md:py-5">
         <Link href={"/"} className="text-lg font-bold">
           Haru<span className="text-[#e94560]">.</span>
         </Link>
@@ -38,12 +38,12 @@ export default function LandingPage() {
       </nav>
 
       {/* 히어로 */}
-      <section className="flex flex-col items-center justify-center px-6 py-32 text-center">
+      <section className="flex flex-col items-center justify-center px-6 py-16 md:py-32 text-center">
         <div className="mb-8 inline-block rounded-full border border-[#e94560]/20 bg-[#e94560]/10 px-3 py-1 text-xs text-[#e94560]">
           북마크 + 투두를 한 곳에서
         </div>
 
-        <h1 className="mb-6 max-w-xl text-5xl leading-tight font-bold">
+        <h1 className="mb-6 max-w-xl text-3xl md:text-5xl leading-tight font-bold">
           하루를 더 잘
           <br />
           <span className="text-[#e94560]">정리</span>하는 방법
@@ -64,7 +64,7 @@ export default function LandingPage() {
       </section>
 
       {/* 기능 소개 */}
-      <section className="mx-auto max-w-4xl px-8 pb-24">
+      <section className="mx-auto max-w-4xl px-4 md:px-8 pb-16 md:pb-24">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {features.map((feature) => (
             <div
