@@ -34,7 +34,7 @@ export default function NewBookmarkPage() {
     setFetching(false);
   }
 
-  async function handleSubmit(e: SubmitEvent) {
+  async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     setError("");
     setSaving(true);
