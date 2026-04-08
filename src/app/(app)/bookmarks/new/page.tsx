@@ -69,7 +69,7 @@ export default function NewBookmarkPage() {
   }
   return (
     <div className="max-w-xl">
-      <h1 className="mb-6 text-xl font-bold text-white">북마크 추가</h1>
+      <h1 className="mt-4 mb-6 text-xl font-bold text-white">북마크 추가</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* URL */}

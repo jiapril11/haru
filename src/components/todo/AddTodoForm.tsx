@@ -36,7 +36,7 @@ export default function AddTodoForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border border-dashed border-white/10 py-3 text-sm text-white/30 transition-colors hover:border-white/20 hover:text-white/50"
+        className="w-full cursor-pointer rounded-xl border border-dashed border-white/10 py-3 text-sm text-white/30 transition-colors hover:border-white/20 hover:text-white/50"
       >
         + 할일 추가
       </button>
@@ -174,14 +174,14 @@ export default function AddTodoForm() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="text-xs text-white/30 transition-colors hover:text-white"
+            className="cursor-pointer text-xs text-white/30 transition-colors hover:text-white"
           >
             취소
           </button>
           <button
             type="submit"
             disabled={addTodo.isPending}
-            className="rounded-lg bg-[#e94560] px-3 py-1.5 text-xs text-white disabled:opacity-50"
+            className="cursor-pointer rounded-lg bg-[#e94560] px-3 py-1.5 text-xs text-white disabled:opacity-50"
           >
             추가
           </button>

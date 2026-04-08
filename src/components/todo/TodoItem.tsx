@@ -35,10 +35,10 @@ export default function TodoItem({ todo }: Props) {
             onClick={() =>
               toggleTodo.mutate({ id: todo.id, is_done: !todo.is_done })
             }
-            className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+            className={`flex h-5 w-5 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-2 transition-colors ${
               todo.is_done
-                ? "border-[#e94560] bg-[#e94560]"
-                : "border-white/20 hover:border-[#e94560]"
+                ? "border-emerald-500 bg-emerald-500"
+                : "border-white/20 hover:border-emerald-500"
             }`}
           >
             {todo.is_done && <span className="text-xs text-white">✓</span>}
@@ -76,7 +76,7 @@ export default function TodoItem({ todo }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="text-xs text-white/20 opacity-0 transition-colors group-hover:opacity-100 hover:text-[#e94560]"
+          className="cursor-pointer text-xs text-white/20 opacity-0 transition-colors group-hover:opacity-100 hover:text-[#e94560]"
         >
           삭제
         </button>

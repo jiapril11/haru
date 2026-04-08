@@ -73,8 +73,8 @@ export default function TodosPage() {
   return (
     <div className="max-w-2xl">
       {/* 헤더 */}
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-white">투두</h1>
+      <div className="mt-4 mb-6">
+        <h1 className="text-xl font-bold text-white">할일</h1>
         <p className="mt-1 text-sm text-white/30">{today}</p>
       </div>
 
@@ -84,7 +84,7 @@ export default function TodosPage() {
           <button
             key={tab.value}
             onClick={() => setView(tab.value)}
-            className={`flex-1 rounded-lg py-2 text-sm transition-colors ${
+            className={`flex-1 cursor-pointer rounded-lg py-2 text-sm transition-colors ${
               view === tab.value
                 ? "bg-[#0f3460] font-medium text-white"
                 : "text-white/40 hover:text-white"
@@ -150,9 +150,11 @@ export default function TodosPage() {
           {done.length > 0 && (
             <div className="mt-4">
               <p className="mb-2 text-xs text-white/20">완료 {done.length}개</p>
-              {done.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} />
-              ))}
+              <div className="flex flex-col gap-2">
+                {done.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} />
+                ))}
+              </div>
             </div>
           )}
 
