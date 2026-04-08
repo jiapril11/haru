@@ -12,7 +12,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-56 border-r border-white/10 bg-[#1a1a2e] p-4">
+    <aside className="fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-56 border-r border-[var(--border)] bg-[var(--surface2)] p-4">
       <nav className="flex flex-col gap-1">
         {menus.map((menu) => (
           <Link
@@ -20,8 +20,8 @@ export default function Sidebar() {
             href={menu.href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
               pathname.startsWith(menu.href)
-                ? "bg-[#0f3460] font-medium text-white"
-                : "text-white/60 hover:bg-white/5 hover:text-white"
+                ? "bg-[var(--accent)] font-medium text-white"
+                : "text-[var(--text-muted)] hover:bg-[var(--border)] hover:text-[var(--text)]"
             }`}
           >
             <span>{menu.icon}</span>

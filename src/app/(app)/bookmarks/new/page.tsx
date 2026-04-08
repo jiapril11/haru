@@ -69,12 +69,12 @@ export default function NewBookmarkPage() {
   }
   return (
     <div className="max-w-xl">
-      <h1 className="mt-4 mb-6 text-xl font-bold text-white">북마크 추가</h1>
+      <h1 className="mt-4 mb-6 text-xl font-bold text-[var(--text)]">북마크 추가</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* URL */}
         <div>
-          <label className="mb-1.5 block text-xs text-white/60">URL *</label>
+          <label className="mb-1.5 block text-xs text-[var(--text-muted)]">URL *</label>
           <div className="relative">
             <input
               type="url"
@@ -83,52 +83,52 @@ export default function NewBookmarkPage() {
               onBlur={handleUrlBlur}
               required
               placeholder="https://example.com"
-              className="w-full rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
             />
             {fetching && (
-              <span className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-white/30">
+              <span className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-[var(--text-subtle)]">
                 불러오는 중...
               </span>
             )}
           </div>
-          <p className="mt-1 text-xs text-white/30">
+          <p className="mt-1 text-xs text-[var(--text-subtle)]">
             URL 입력 후 포커스를 벗어나면 자동으로 정보를 가져옵니다.
           </p>
         </div>
 
         {/* 제목 */}
         <div>
-          <label className="mb-1.5 block text-xs text-white/60">제목</label>
+          <label className="mb-1.5 block text-xs text-[var(--text-muted)]">제목</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="자동으로 가져옵니다"
-            className="w-full rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
           />
         </div>
 
         {/* 설명 */}
         <div>
-          <label className="mb-1.5 block text-xs text-white/60">설명</label>
+          <label className="mb-1.5 block text-xs text-[var(--text-muted)]">설명</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="자동으로 가져옵니다"
             rows={3}
-            className="w-full resize-none rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+            className="w-full resize-none rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
           />
         </div>
 
         {/* 태그 */}
         <div>
-          <label className="mb-1.5 block text-xs text-white/60">태그</label>
+          <label className="mb-1.5 block text-xs text-[var(--text-muted)]">태그</label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="React, 디자인, 참고자료 (쉼표로 구분)"
-            className="w-full rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
           />
         </div>
 
@@ -138,7 +138,7 @@ export default function NewBookmarkPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 rounded-lg bg-white/5 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/10"
+            className="flex-1 rounded-lg bg-[var(--border)] py-2.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-[var(--border)]"
           >
             취소
           </button>

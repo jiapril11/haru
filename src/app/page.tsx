@@ -23,7 +23,7 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0d0d1a] text-white">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       {/* 네비게이션 */}
       <nav className="flex items-center justify-between border-b border-white/5 px-8 py-5">
         <Link href={"/"} className="text-lg font-bold">
@@ -31,7 +31,7 @@ export default function LandingPage() {
         </Link>
         <Link
           href="/auth/login"
-          className="text-sm text-white/60 transition-colors hover:text-white"
+          className="text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--text)]"
         >
           로그인
         </Link>
@@ -49,7 +49,7 @@ export default function LandingPage() {
           <span className="text-[#e94560]">정리</span>하는 방법
         </h1>
 
-        <p className="mb-10 max-w-md text-lg leading-relaxed text-white/40">
+        <p className="mb-10 max-w-md text-lg leading-relaxed text-[var(--text-subtle)]">
           중요한 링크와 할일을 한 곳에서 관리하세요.
           <br />
           저장하고, 계획하고, 실행하세요.
@@ -69,11 +69,11 @@ export default function LandingPage() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-white/10 bg-[#16213e] p-6 transition-colors hover:border-white/20"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-colors hover:border-[var(--border)]"
             >
               <div className="mb-4 text-3xl">{feature.icon}</div>
-              <h3 className="mb-2 font-bold text-white">{feature.title}</h3>
-              <p className="text-sm leading-relaxed text-white/40">
+              <h3 className="mb-2 font-bold text-[var(--text)]">{feature.title}</h3>
+              <p className="text-sm leading-relaxed text-[var(--text-subtle)]">
                 {feature.description}
               </p>
             </div>
@@ -84,7 +84,7 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="border-t border-white/5 px-6 py-24 text-center">
         <h2 className="mb-4 text-3xl font-bold">지금 바로 시작해보세요</h2>
-        <p className="mb-8 text-sm text-white/40">
+        <p className="mb-8 text-sm text-[var(--text-subtle)]">
           가입하고 첫 번째 북마크를 저장해보세요.
         </p>
         <Link
@@ -96,7 +96,7 @@ export default function LandingPage() {
       </section>
 
       {/* 푸터 */}
-      <footer className="border-t border-white/5 py-6 text-center text-xs text-white/20">
+      <footer className="border-t border-white/5 py-6 text-center text-xs text-[var(--text-faint)]">
         © 2026 Haru. Built with Next.js & Supabase.
       </footer>
     </div>

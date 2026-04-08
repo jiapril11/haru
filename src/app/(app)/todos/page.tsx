@@ -74,20 +74,20 @@ export default function TodosPage() {
     <div className="max-w-2xl">
       {/* 헤더 */}
       <div className="mt-4 mb-6">
-        <h1 className="text-xl font-bold text-white">할일</h1>
-        <p className="mt-1 text-sm text-white/30">{today}</p>
+        <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>
+        <p className="mt-1 text-sm text-[var(--text-subtle)]">{today}</p>
       </div>
 
       {/* 탭 */}
-      <div className="mb-6 flex rounded-xl bg-[#16213e] p-1">
+      <div className="mb-6 flex rounded-xl bg-[var(--surface)] p-1">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setView(tab.value)}
             className={`flex-1 cursor-pointer rounded-lg py-2 text-sm transition-colors ${
               view === tab.value
-                ? "bg-[#0f3460] font-medium text-white"
-                : "text-white/40 hover:text-white"
+                ? "bg-[var(--accent)] font-medium text-white"
+                : "text-[var(--text-subtle)] hover:text-[var(--text)]"
             }`}
           >
             {tab.label}
@@ -96,7 +96,7 @@ export default function TodosPage() {
       </div>
 
       {isLoading ? (
-        <p className="py-12 text-center text-sm text-white/30">
+        <p className="py-12 text-center text-sm text-[var(--text-subtle)]">
           불러오는 중...
         </p>
       ) : view === "calendar" ? (
@@ -109,12 +109,12 @@ export default function TodosPage() {
           />
           {selectedDate && (
             <div>
-              <p className="mb-2 text-xs text-white/40">
+              <p className="mb-2 text-xs text-[var(--text-subtle)]">
                 {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
                 {calendarTodos.length}개
               </p>
               {calendarTodos.length === 0 ? (
-                <p className="py-6 text-center text-sm text-white/20">
+                <p className="py-6 text-center text-sm text-[var(--text-faint)]">
                   할일이 없어요
                 </p>
               ) : (
@@ -149,7 +149,7 @@ export default function TodosPage() {
 
           {done.length > 0 && (
             <div className="mt-4">
-              <p className="mb-2 text-xs text-white/20">완료 {done.length}개</p>
+              <p className="mb-2 text-xs text-[var(--text-faint)]">완료 {done.length}개</p>
               <div className="flex flex-col gap-2">
                 {done.map((todo) => (
                   <TodoItem key={todo.id} todo={todo} />
@@ -161,7 +161,7 @@ export default function TodosPage() {
           {filtered.length === 0 && (
             <div className="py-16 text-center">
               <p className="mb-3 text-3xl">✅</p>
-              <p className="text-sm text-white/30">할일이 없어요!</p>
+              <p className="text-sm text-[var(--text-subtle)]">할일이 없어요!</p>
             </div>
           )}
         </div>

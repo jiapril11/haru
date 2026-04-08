@@ -46,18 +46,18 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-[var(--text)]">
           Haru<span className="text-[#e94560]">.</span>
         </h1>
-        <p className="mt-2 text-sm text-white/40">북마크와 투두를 한 곳에서</p>
+        <p className="mt-2 text-sm text-[var(--text-subtle)]">북마크와 투두를 한 곳에서</p>
       </div>
 
       {/* card */}
-      <div className="rounded-2xl border border-white/10 bg-[#16213e] p-8">
-        <div className="mb-6 flex rounded-lg bg-[#0d0d1a] p-1">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
+        <div className="mb-6 flex rounded-lg bg-[var(--bg)] p-1">
           <button
             onClick={() => setMode("login")}
-            className={`flex-1 cursor-pointer rounded-md py-2 text-sm transition-colors ${mode === "login" ? "bg-[#0f3460] font-medium text-white" : "text-white/40 hover:text-white"}`}
+            className={`flex-1 cursor-pointer rounded-md py-2 text-sm transition-colors ${mode === "login" ? "bg-[var(--accent)] font-medium text-white" : "text-[var(--text-subtle)] hover:text-[var(--text)]"}`}
           >
             로그인
           </button>
@@ -67,8 +67,8 @@ export default function LoginPage() {
             }}
             className={`flex-1 cursor-pointer rounded-md py-2 text-sm transition-colors ${
               mode === "signup"
-                ? "bg-[#0f3460] font-medium text-white"
-                : "text-white/40 hover:text-white"
+                ? "bg-[var(--accent)] font-medium text-white"
+                : "text-[var(--text-subtle)] hover:text-[var(--text)]"
             }`}
           >
             회원가입
@@ -78,18 +78,18 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-xs text-white/60">이메일</label>
+            <label className="mb-1.5 block text-xs text-[var(--text-muted)]">이메일</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="hello@example.com"
-              className="w-full rounded-lg border border-white/10 bg-[#0d0d1a] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs text-white/60">
+            <label className="mb-1.5 block text-xs text-[var(--text-muted)]">
               비밀번호
             </label>
             <input
@@ -98,7 +98,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="6자 이상"
-              className="w-full rounded-lg border border-white/10 bg-[#0d0d1a] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
 

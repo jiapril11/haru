@@ -32,7 +32,7 @@ export default function SortableTodoItem({ todo }: Props) {
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab touch-none px-1 text-white/20 hover:text-white/50 active:cursor-grabbing"
+          className="cursor-grab touch-none px-1 text-[var(--text-faint)] hover:text-[var(--text-muted)] active:cursor-grabbing"
         >
           ⠿
         </button>

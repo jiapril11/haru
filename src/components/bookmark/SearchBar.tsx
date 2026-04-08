@@ -27,7 +27,7 @@ export default function SearchBar() {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       placeholder="제목, URL, 태그 검색"
-      className="mb-4 w-full rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+      className="mb-4 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
     />
   );
 }

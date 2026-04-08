@@ -36,7 +36,7 @@ export default function AddTodoForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full cursor-pointer rounded-xl border border-dashed border-white/10 py-3 text-sm text-white/30 transition-colors hover:border-white/20 hover:text-white/50"
+        className="w-full cursor-pointer rounded-xl border border-dashed border-[var(--border)] py-3 text-sm text-[var(--text-subtle)] transition-colors hover:border-[var(--border)] hover:text-[var(--text-muted)]"
       >
         + 할일 추가
       </button>
@@ -46,7 +46,7 @@ export default function AddTodoForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-xl border border-[#0f3460] bg-[#16213e] p-4"
+      className="flex flex-col gap-3 rounded-xl border border-[var(--accent)] bg-[var(--surface)] p-4"
     >
       <input
         autoFocus
@@ -54,7 +54,7 @@ export default function AddTodoForm() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="할일을 입력하세요"
-        className="bg-transparent text-sm text-white placeholder:text-white/20 focus:outline-none"
+        className="bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:outline-none"
       />
 
       <div className="flex flex-wrap items-center gap-3">
@@ -62,7 +62,7 @@ export default function AddTodoForm() {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as Todo["priority"])}
-          className="rounded-lg border border-white/10 bg-[#0d0d1a] px-2 py-1.5 text-xs text-white/60 focus:outline-none"
+          className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
         >
           <option value="high">높음</option>
           <option value="medium">보통</option>
@@ -81,7 +81,7 @@ export default function AddTodoForm() {
           className={`rounded-lg border px-2 py-1.5 text-xs transition-colors ${
             isRange
               ? "border-[#e94560] text-[#e94560]"
-              : "border-white/10 text-white/40 hover:border-white/30"
+              : "border-[var(--border)] text-[var(--text-subtle)] hover:border-[var(--text-subtle)]"
           }`}
         >
           {isRange ? "기간 ✓" : "기간 설정"}
@@ -95,7 +95,7 @@ export default function AddTodoForm() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="rounded-lg border border-white/10 bg-[#0d0d1a] px-2 py-1.5 text-xs text-white/60 focus:outline-none"
+                className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
               />
               <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
                 <svg
@@ -115,13 +115,13 @@ export default function AddTodoForm() {
                 </svg>
               </div>
             </label>
-            <span className="text-xs text-white/30">~</span>
+            <span className="text-xs text-[var(--text-subtle)]">~</span>
             <label className="relative cursor-pointer">
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="rounded-lg border border-white/10 bg-[#0d0d1a] px-2 py-1.5 text-xs text-white/60 focus:outline-none"
+                className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
               />
               <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
                 <svg
@@ -148,7 +148,7 @@ export default function AddTodoForm() {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="rounded-lg border border-white/10 bg-[#0d0d1a] px-2 py-1.5 text-xs text-white/60 focus:outline-none"
+              className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
             />
             <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
               <svg
@@ -174,7 +174,7 @@ export default function AddTodoForm() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="cursor-pointer text-xs text-white/30 transition-colors hover:text-white"
+            className="cursor-pointer text-xs text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
           >
             취소
           </button>

@@ -32,10 +32,10 @@ export default function BookmarksPage() {
     <div>
       {/* 헤더 */}
       <div className="mt-4 mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">
+        <h1 className="text-xl font-bold text-[var(--text)]">
           북마크
           {activeTag && (
-            <span className="ml-2 text-sm font-normal text-white/40">
+            <span className="ml-2 text-sm font-normal text-[var(--text-subtle)]">
               #{activeTag}
             </span>
           )}
@@ -54,7 +54,7 @@ export default function BookmarksPage() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="제목, URL, 태그 검색..."
-        className="mb-4 w-full rounded-lg border border-white/10 bg-[#16213e] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#0f3460] focus:outline-none"
+        className="mb-4 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none"
       />
 
       {/* 태그 필터 */}
@@ -67,7 +67,7 @@ export default function BookmarksPage() {
               className={`cursor-pointer rounded-full px-3 py-1.5 text-xs transition-colors ${
                 activeTag === tag
                   ? "bg-[#e94560] text-white"
-                  : "border border-white/10 bg-[#16213e] text-white/50 hover:text-white"
+                  : "border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text)]"
               }`}
             >
               {tag}
@@ -79,7 +79,7 @@ export default function BookmarksPage() {
       {/* 로딩 */}
       {isLoading && (
         <div className="flex justify-center py-24">
-          <p className="text-sm text-white/30">불러오는 중...</p>
+          <p className="text-sm text-[var(--text-subtle)]">불러오는 중...</p>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function BookmarksPage() {
       {!isLoading && (!filtered || filtered.length === 0) ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <p className="mb-4 text-4xl">🔖</p>
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-[var(--text-subtle)]">
             {q || activeTag
               ? "검색 결과가 없어요."
               : "아직 저장된 북마크가 없어요."}

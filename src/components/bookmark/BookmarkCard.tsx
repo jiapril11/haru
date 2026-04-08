@@ -30,7 +30,7 @@ export default function BookmarkCard({ bookmark }: Props) {
     queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
   }
   return (
-    <div className="group flex flex-col rounded-xl border border-white/10 bg-[#16213e] p-4 transition-colors hover:border-white/20">
+    <div className="group flex flex-col rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border)]">
       <div className="mb-3 flex items-center gap-2">
         {bookmark.favicon_url ? (
           <img
@@ -39,9 +39,9 @@ export default function BookmarkCard({ bookmark }: Props) {
             className="h-4 w-4 rounded-sm"
           />
         ) : (
-          <div className="h-4 w-4 rounded-sm bg-white/10" />
+          <div className="h-4 w-4 rounded-sm bg-[var(--border)]" />
         )}
-        <span className="flex-1 truncate text-xs text-white/30">
+        <span className="flex-1 truncate text-xs text-[var(--text-subtle)]">
           {new URL(bookmark.url).hostname}
         </span>
         <button
@@ -49,19 +49,19 @@ export default function BookmarkCard({ bookmark }: Props) {
           className={`cursor-pointer text-sm transition-colors ${
             isFavorite
               ? "text-yellow-400"
-              : "text-white/20 hover:text-yellow-400"
+              : "text-[var(--text-faint)] hover:text-yellow-400"
           }`}
         >
           ★
         </button>
       </div>
 
-      <h3 className="mb-1 line-clamp-2 text-sm leading-relaxed font-medium text-white">
+      <h3 className="mb-1 line-clamp-2 text-sm leading-relaxed font-medium text-[var(--text)]">
         {bookmark.title ?? bookmark.url}
       </h3>
 
       {bookmark.description && (
-        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-white/40">
+        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-[var(--text-subtle)]">
           {bookmark.description}
         </p>
       )}
@@ -71,7 +71,7 @@ export default function BookmarkCard({ bookmark }: Props) {
           {bookmark.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-[#0f3460] px-2 py-0.5 text-xs text-white/60"
+              className="rounded-full bg-[var(--accent)]/15 px-2 py-0.5 text-xs text-[var(--accent)]"
             >
               {tag}
             </span>
@@ -90,7 +90,7 @@ export default function BookmarkCard({ bookmark }: Props) {
         </a>
         <button
           onClick={handleDelete}
-          className="cursor-pointer text-xs text-white/20 transition-colors hover:text-[#e94560]"
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
         >
           삭제
         </button>

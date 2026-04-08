@@ -52,10 +52,10 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
               title={format(day, "M월 d일 (EEE)", { locale: ko })}
               className={`h-5 w-5 rounded-md text-xs font-medium transition-colors ${
                 isChecked
-                  ? "bg-emerald-500 text-white"
+                  ? "bg-emerald-500 text-[var(--text)]"
                   : isFutureDay
-                    ? "cursor-not-allowed bg-white/10 text-white/15"
-                    : "cursor-pointer bg-white/10 text-white/40 hover:bg-white/20"
+                    ? "cursor-not-allowed bg-[var(--border)] text-[var(--text-faint)]"
+                    : "cursor-pointer bg-[var(--border)] text-[var(--text-subtle)] hover:bg-[var(--text-faint)]"
               }`}
             ></button>
           );
@@ -63,13 +63,13 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
       </div>
       {/* 진행률 */}
       <div className="flex items-center gap-2">
-        <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+        <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--border)]">
           <div
             className="h-full rounded-full bg-emerald-500 transition-all"
             style={{ width: `${(completedCount / days.length) * 100}%` }}
           />
         </div>
-        <span className="text-xs text-white/30">
+        <span className="text-xs text-[var(--text-subtle)]">
           {completedCount}/{days.length}일
         </span>
       </div>

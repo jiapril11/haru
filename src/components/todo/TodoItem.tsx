@@ -27,7 +27,7 @@ export default function TodoItem({ todo }: Props) {
   const isRange = !!todo.start_date && !!todo.due_date;
 
   return (
-    <div className="group rounded-xl border border-white/10 bg-[#16213e] px-4 py-3">
+    <div className="group rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
       <div className="flex items-center gap-3">
         {/* 체크박스 — 기간 투두는 숨김 */}
         {!isRange && (
@@ -38,10 +38,10 @@ export default function TodoItem({ todo }: Props) {
             className={`flex h-5 w-5 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-2 transition-colors ${
               todo.is_done
                 ? "border-emerald-500 bg-emerald-500"
-                : "border-white/20 hover:border-emerald-500"
+                : "border-[var(--border)] hover:border-emerald-500"
             }`}
           >
-            {todo.is_done && <span className="text-xs text-white">✓</span>}
+            {todo.is_done && <span className="text-xs text-[var(--text)]">✓</span>}
           </button>
         )}
 
@@ -49,8 +49,8 @@ export default function TodoItem({ todo }: Props) {
         <span
           className={`flex-1 text-sm ${
             !isRange && todo.is_done
-              ? "text-white/30 line-through"
-              : "text-white"
+              ? "text-[var(--text-subtle)] line-through"
+              : "text-[var(--text)]"
           }`}
         >
           {todo.title}
@@ -58,7 +58,7 @@ export default function TodoItem({ todo }: Props) {
 
         {/* 기간 표시 */}
         {isRange && (
-          <span className="text-xs text-white/30">
+          <span className="text-xs text-[var(--text-subtle)]">
             {todo.start_date?.slice(5).replace("-", "/")} ~{" "}
             {todo.due_date?.slice(5).replace("-", "/")}
           </span>
@@ -76,7 +76,7 @@ export default function TodoItem({ todo }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="cursor-pointer text-xs text-white/20 opacity-0 transition-colors group-hover:opacity-100 hover:text-[#e94560]"
+          className="cursor-pointer text-xs text-[var(--text-faint)] opacity-0 transition-colors group-hover:opacity-100 hover:text-[#e94560]"
         >
           삭제
         </button>

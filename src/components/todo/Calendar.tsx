@@ -41,21 +41,21 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#16213e] p-4">
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
       {/* 월 이동 */}
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => setBaseDate(subMonths(baseDate, 1))}
-          className="px-2 text-white/40 transition-colors hover:text-white"
+          className="px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
         >
           ←
         </button>
-        <h2 className="font-bold text-white">
+        <h2 className="font-bold text-[var(--text)]">
           {format(baseDate, "yyyy년 M월", { locale: ko })}
         </h2>
         <button
           onClick={() => setBaseDate(addMonths(baseDate, 1))}
-          className="px-2 text-white/40 transition-colors hover:text-white"
+          className="px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
         >
           →
         </button>
@@ -64,7 +64,7 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
       {/* 요일 헤더 */}
       <div className="mb-2 grid grid-cols-7">
         {DAY_LABELS.map((d) => (
-          <div key={d} className="py-1 text-center text-xs text-white/30">
+          <div key={d} className="py-1 text-center text-xs text-[var(--text-subtle)]">
             {d}
           </div>
         ))}
@@ -85,17 +85,17 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
                 isSelected
                   ? "bg-[#e94560]"
                   : isToday(day)
-                    ? "bg-[#0f3460]"
+                    ? "bg-[var(--accent)]"
                     : isThisWeekDay && isCurrentMonth
-                      ? "bg-white/5"
+                      ? "bg-[var(--border)]"
                       : ""
-              } ${!isCurrentMonth ? "opacity-25" : "hover:bg-white/10"}`}
+              } ${!isCurrentMonth ? "opacity-25" : "hover:bg-[var(--border)]"}`}
             >
               <span
                 className={`text-xs ${
                   isSelected || isToday(day)
                     ? "font-bold text-white"
-                    : "text-white/60"
+                    : "text-[var(--text-muted)]"
                 }`}
               >
                 {format(day, "d")}
