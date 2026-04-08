@@ -54,9 +54,18 @@ export default function TodosPage() {
   const done = filtered.filter((t) => t.is_done);
 
   const calendarTodos = selectedDate
-    ? (todos?.filter(
-        (t) => t.due_date && isSameDay(parseISO(t.due_date), selectedDate),
-      ) ?? [])
+    ? (todos?.filter((t) => {
+        if (!t.due_date) return false;
+        // 기간 투두: 선택한 날짜가 범위 안에 포함되면 표시
+        if (t.start_date) {
+          return (
+            selectedDate >= parseISO(t.start_date) &&
+            selectedDate <= parseISO(t.due_date)
+          );
+        }
+        // 단일 투두: due_date와 같은 날
+        return isSameDay(parseISO(t.due_date), selectedDate);
+      }) ?? [])
     : [];
 
   function handleDragEnd(event: DragEndEvent) {

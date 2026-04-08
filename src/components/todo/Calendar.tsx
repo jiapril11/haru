@@ -35,9 +35,17 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
   const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
   function hasTodo(date: Date) {
-    return todos.some(
-      (t) => t.due_date && isSameDay(parseISO(t.due_date), date),
-    );
+    return todos.some((t) => {
+      if (!t.due_date) return false;
+      // 기간 투두: start_date ~ due_date 범위 안에 포함되면 표시
+      if (t.start_date) {
+        return (
+          date >= parseISO(t.start_date) && date <= parseISO(t.due_date)
+        );
+      }
+      // 단일 투두: due_date와 같은 날
+      return isSameDay(parseISO(t.due_date), date);
+    });
   }
 
   return (
