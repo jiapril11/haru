@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/static-components */
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -22,11 +23,20 @@ import AddTodoForm from "@/components/todo/AddTodoForm";
 import Calendar from "@/components/todo/Calendar";
 import { format, isSameDay, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Todo } from "@/types";
 
-type Tab = TodoView | "all" | "calendar";
+type MobileTab = TodoView | "all" | "calendar";
+type RightTab = "week" | "month" | "all" | "calendar";
 
-const tabs: { label: string; value: Tab }[] = [
+const mobileTabs: { label: string; value: MobileTab }[] = [
   { label: "오늘", value: "today" },
+  { label: "이번 주", value: "week" },
+  { label: "이번 달", value: "month" },
+  { label: "전체", value: "all" },
+  { label: "달력", value: "calendar" },
+];
+
+const rightTabs: { label: string; value: RightTab }[] = [
   { label: "이번 주", value: "week" },
   { label: "이번 달", value: "month" },
   { label: "전체", value: "all" },
@@ -36,144 +46,280 @@ const tabs: { label: string; value: Tab }[] = [
 export default function TodosPage() {
   const { data: todos, isLoading } = useTodos();
   const updateOrder = useUpdateTodoOrder();
-  const [view, setView] = useState<Tab>("today");
+
+  const [mobileView, setMobileView] = useState<MobileTab>("today");
+  const [rightView, setRightView] = useState<RightTab>("week");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [leftWidth, setLeftWidth] = useState(50); // 왼쪽 패널 너비 (%)
+
+  const isDragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const sensors = useSensors(useSensor(PointerSensor));
+  const todayLabel = format(new Date(), "yyyy년 M월 d일 EEEE", { locale: ko });
 
-  const today = format(new Date(), "yyyy년 M월 d일 EEEE", { locale: ko });
+  // 오늘 데이터
+  const todayTodos =
+    todos?.filter((t) => filterByView(t.due_date, "today", t.start_date)) ?? [];
+  const todayUndone = todayTodos.filter((t) => !t.is_done);
+  const todayDone = todayTodos.filter((t) => t.is_done);
 
-  const filtered =
-    view === "calendar"
+  // 오른쪽 탭 데이터
+  const rightFiltered =
+    rightView === "calendar"
       ? []
-      : view === "all"
+      : rightView === "all"
         ? (todos ?? [])
-        : (todos?.filter((t) => filterByView(t.due_date, view, t.start_date)) ??
-          []);
+        : (todos?.filter((t) =>
+            filterByView(t.due_date, rightView as TodoView, t.start_date),
+          ) ?? []);
+  const rightUndone = rightFiltered.filter((t) => !t.is_done);
+  const rightDone = rightFiltered.filter((t) => t.is_done);
 
-  const undone = filtered.filter((t) => !t.is_done);
-  const done = filtered.filter((t) => t.is_done);
+  // 모바일 데이터
+  const mobileFiltered =
+    mobileView === "calendar"
+      ? []
+      : mobileView === "all"
+        ? (todos ?? [])
+        : mobileView === "today"
+          ? todayTodos
+          : (todos?.filter((t) =>
+              filterByView(t.due_date, mobileView as TodoView, t.start_date),
+            ) ?? []);
+  const mobileUndone = mobileFiltered.filter((t) => !t.is_done);
+  const mobileDone = mobileFiltered.filter((t) => t.is_done);
 
   const calendarTodos = selectedDate
     ? (todos?.filter((t) => {
         if (!t.due_date) return false;
-        // 기간 투두: 선택한 날짜가 범위 안에 포함되면 표시
         if (t.start_date) {
           return (
             selectedDate >= parseISO(t.start_date) &&
             selectedDate <= parseISO(t.due_date)
           );
         }
-        // 단일 투두: due_date와 같은 날
         return isSameDay(parseISO(t.due_date), selectedDate);
       }) ?? [])
     : [];
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = undone.findIndex((t) => t.id === active.id);
-    const newIndex = undone.findIndex((t) => t.id === over.id);
-    const reordered = arrayMove(undone, oldIndex, newIndex);
-    updateOrder.mutate(
-      reordered.map((todo, index) => ({ id: todo.id, sort_order: index })),
+  function makeDragHandler(undone: Todo[]) {
+    return (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIndex = undone.findIndex((t) => t.id === active.id);
+      const newIndex = undone.findIndex((t) => t.id === over.id);
+      const reordered = arrayMove(undone, oldIndex, newIndex);
+      updateOrder.mutate(
+        reordered.map((todo, index) => ({ id: todo.id, sort_order: index })),
+      );
+    };
+  }
+
+  function TodoList({
+    undone,
+    done,
+    filtered,
+    showAddForm = false,
+  }: {
+    undone: Todo[];
+    done: Todo[];
+    filtered: Todo[];
+    showAddForm?: boolean;
+  }) {
+    return (
+      <div className="flex flex-col gap-2">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={makeDragHandler(undone)}
+        >
+          <SortableContext
+            items={undone.map((t) => t.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {undone.map((todo) => (
+              <SortableTodoItem key={todo.id} todo={todo} />
+            ))}
+          </SortableContext>
+        </DndContext>
+
+        {showAddForm && <AddTodoForm />}
+
+        {done.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs text-[var(--text-faint)]">
+              완료 {done.length}개
+            </p>
+            <div className="flex flex-col gap-2">
+              {done.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {filtered.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="mb-3 text-3xl">✅</p>
+            <p className="text-sm text-[var(--text-subtle)]">할일이 없어요!</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function CalendarView() {
+    return (
+      <div className="flex flex-col gap-4">
+        <Calendar
+          todos={todos ?? []}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+        {selectedDate && (
+          <div>
+            <p className="mb-2 text-xs text-[var(--text-subtle)]">
+              {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
+              {calendarTodos.length}개
+            </p>
+            {calendarTodos.length === 0 ? (
+              <p className="py-6 text-center text-sm text-[var(--text-faint)]">
+                할일이 없어요
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {calendarTodos.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
   }
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="flex h-full w-full flex-col">
       {/* 헤더 */}
-      <div className="mt-4 mb-6">
+      <div className="mt-4 mb-6 shrink-0">
         <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>
-        <p className="mt-1 text-sm text-[var(--text-subtle)]">{today}</p>
-      </div>
-
-      {/* 탭 */}
-      <div className="mb-6 flex rounded-xl bg-[var(--surface)] p-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => setView(tab.value)}
-            className={`flex-1 cursor-pointer rounded-lg py-2 text-xs md:text-sm transition-colors ${
-              view === tab.value
-                ? "bg-[var(--accent)] font-medium text-white"
-                : "text-[var(--text-subtle)] hover:text-[var(--text)]"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        <p className="mt-1 text-sm text-[var(--text-subtle)]">{todayLabel}</p>
       </div>
 
       {isLoading ? (
         <p className="py-12 text-center text-sm text-[var(--text-subtle)]">
           불러오는 중...
         </p>
-      ) : view === "calendar" ? (
-        /* ── 달력 뷰 ── */
-        <div className="flex flex-col gap-4">
-          <Calendar
-            todos={todos ?? []}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-          />
-          {selectedDate && (
-            <div>
-              <p className="mb-2 text-xs text-[var(--text-subtle)]">
-                {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
-                {calendarTodos.length}개
-              </p>
-              {calendarTodos.length === 0 ? (
-                <p className="py-6 text-center text-sm text-[var(--text-faint)]">
-                  할일이 없어요
-                </p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {calendarTodos.map((todo) => (
-                    <TodoItem key={todo.id} todo={todo} />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       ) : (
-        /* ── 목록 뷰 ── */
-        <div className="flex flex-col gap-2">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={undone.map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {undone.map((todo) => (
-                <SortableTodoItem key={todo.id} todo={todo} />
+        <>
+          {/* ── 모바일 ── */}
+          <div className="md:hidden">
+            <div className="mb-6 flex rounded-xl bg-[var(--surface)] p-1">
+              {mobileTabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setMobileView(tab.value)}
+                  className={`flex-1 cursor-pointer rounded-lg py-2 text-xs transition-colors ${
+                    mobileView === tab.value
+                      ? "bg-[var(--accent)] font-medium text-white"
+                      : "text-[var(--text-subtle)] hover:text-[var(--text)]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
               ))}
-            </SortableContext>
-          </DndContext>
+            </div>
+            {mobileView === "calendar" ? (
+              <CalendarView />
+            ) : (
+              <TodoList
+                undone={mobileUndone}
+                done={mobileDone}
+                filtered={mobileFiltered}
+                showAddForm
+              />
+            )}
+          </div>
 
-          <AddTodoForm />
+          {/* ── 데스크탑: 리사이즈 2열 ── */}
+          <div ref={containerRef} className="hidden min-h-0 flex-1 md:flex">
+            {/* 왼쪽: 오늘 */}
+            <div
+              style={{ width: `${leftWidth}%` }}
+              className="min-w-0 overflow-y-auto pr-4"
+            >
+              <p className="mb-4 text-sm font-semibold text-[var(--text)]">
+                오늘
+              </p>
+              <TodoList
+                undone={todayUndone}
+                done={todayDone}
+                filtered={todayTodos}
+                showAddForm
+              />
+            </div>
 
-          {done.length > 0 && (
-            <div className="mt-4">
-              <p className="mb-2 text-xs text-[var(--text-faint)]">완료 {done.length}개</p>
-              <div className="flex flex-col gap-2">
-                {done.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
-                ))}
+            {/* 리사이즈 핸들 */}
+            <div
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                isDragging.current = true;
+                document.body.style.userSelect = "none";
+              }}
+              onPointerMove={(e) => {
+                if (!isDragging.current || !containerRef.current) return;
+                const rect = containerRef.current.getBoundingClientRect();
+                const newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+                setLeftWidth(Math.min(75, Math.max(25, newWidth)));
+              }}
+              onPointerUp={() => {
+                isDragging.current = false;
+                document.body.style.userSelect = "";
+              }}
+              className="group relative flex w-4 shrink-0 cursor-col-resize items-center justify-center"
+            >
+              <div className="h-full w-px bg-[var(--border)] transition-colors group-hover:bg-[var(--accent)]" />
+              <div className="absolute flex flex-col gap-1 rounded-full bg-[var(--surface)] px-1 py-2 shadow-sm transition-colors group-hover:bg-[var(--accent)]">
+                <span className="block h-px w-2 bg-[var(--text-faint)] group-hover:bg-white" />
+                <span className="block h-px w-2 bg-[var(--text-faint)] group-hover:bg-white" />
+                <span className="block h-px w-2 bg-[var(--text-faint)] group-hover:bg-white" />
               </div>
             </div>
-          )}
 
-          {filtered.length === 0 && (
-            <div className="py-16 text-center">
-              <p className="mb-3 text-3xl">✅</p>
-              <p className="text-sm text-[var(--text-subtle)]">할일이 없어요!</p>
+            {/* 오른쪽: 나머지 탭 */}
+            <div
+              style={{ width: `${100 - leftWidth}%` }}
+              className="min-w-0 overflow-y-auto pl-4"
+            >
+              <div className="mb-4 flex rounded-xl bg-[var(--surface)] p-1">
+                {rightTabs.map((tab) => (
+                  <button
+                    key={tab.value}
+                    onClick={() => setRightView(tab.value)}
+                    className={`flex-1 cursor-pointer rounded-lg py-2 text-sm transition-colors ${
+                      rightView === tab.value
+                        ? "bg-[var(--accent)] font-medium text-white"
+                        : "text-[var(--text-subtle)] hover:text-[var(--text)]"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              {rightView === "calendar" ? (
+                <CalendarView />
+              ) : (
+                <TodoList
+                  undone={rightUndone}
+                  done={rightDone}
+                  filtered={rightFiltered}
+                />
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

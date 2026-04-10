@@ -7,7 +7,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-[var(--bg)]">
       <Gnb />
       <Sidebar />
-      <main className="pt-14 px-4 pb-20 md:ml-56 md:px-6 md:pb-6 text-[var(--text)]">
+      <main className="h-dvh overflow-y-auto px-4 pt-14 pb-20 text-[var(--text)] md:ml-56 md:px-6 md:pb-6">
         {children}
       </main>
       <BottomNav />
