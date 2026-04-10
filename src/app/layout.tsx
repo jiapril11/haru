@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import ThemeProvider from "@/providers/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const pretendard = localFont({
   src: "../../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
@@ -26,6 +27,7 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
