@@ -7,9 +7,10 @@ import TodoItem from "./TodoItem";
 
 type Props = {
   todo: Todo;
+  showDate?: boolean;
 };
 
-export default function SortableTodoItem({ todo }: Props) {
+export default function SortableTodoItem({ todo, showDate = false }: Props) {
   const {
     attributes,
     listeners,
@@ -37,7 +38,7 @@ export default function SortableTodoItem({ todo }: Props) {
           ⠿
         </button>
         <div className="flex-1">
-          <TodoItem todo={todo} />
+          <TodoItem todo={todo} showDate={showDate} />
         </div>
       </div>
     </div>

@@ -121,11 +121,13 @@ export default function TodosPage() {
     done,
     filtered,
     showAddForm = false,
+    showDate = false,
   }: {
     undone: Todo[];
     done: Todo[];
     filtered: Todo[];
     showAddForm?: boolean;
+    showDate?: boolean;
   }) {
     return (
       <div className="flex flex-col gap-2">
@@ -139,7 +141,7 @@ export default function TodosPage() {
             strategy={verticalListSortingStrategy}
           >
             {undone.map((todo) => (
-              <SortableTodoItem key={todo.id} todo={todo} />
+              <SortableTodoItem key={todo.id} todo={todo} showDate={showDate} />
             ))}
           </SortableContext>
         </DndContext>
@@ -153,7 +155,7 @@ export default function TodosPage() {
             </p>
             <div className="flex flex-col gap-2">
               {done.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} />
+                <TodoItem key={todo.id} todo={todo} showDate={showDate} />
               ))}
             </div>
           </div>
@@ -315,6 +317,7 @@ export default function TodosPage() {
                   undone={rightUndone}
                   done={rightDone}
                   filtered={rightFiltered}
+                  showDate
                 />
               )}
             </div>

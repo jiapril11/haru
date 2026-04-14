@@ -18,9 +18,10 @@ const priorityLabel = {
 
 type Props = {
   todo: Todo;
+  showDate?: boolean;
 };
 
-export default function TodoItem({ todo }: Props) {
+export default function TodoItem({ todo, showDate = false }: Props) {
   const toggleTodo = useToggleTodo();
   const deleteTodo = useDeleteTodo();
 
@@ -41,7 +42,9 @@ export default function TodoItem({ todo }: Props) {
                 : "border-[var(--border)] hover:border-emerald-500"
             }`}
           >
-            {todo.is_done && <span className="text-xs text-[var(--text)]">✓</span>}
+            {todo.is_done && (
+              <span className="text-xs text-[var(--text)]">✓</span>
+            )}
           </button>
         )}
 
@@ -57,9 +60,13 @@ export default function TodoItem({ todo }: Props) {
         </span>
 
         {/* 기간 표시 */}
-        {isRange && (
+        {isRange ? (
           <span className="text-xs text-[var(--text-subtle)]">
             {todo.start_date?.slice(5).replace("-", "/")} ~{" "}
+            {todo.due_date?.slice(5).replace("-", "/")}
+          </span>
+        ) : showDate && (
+          <span className="text-xs text-[var(--text-subtle)]">
             {todo.due_date?.slice(5).replace("-", "/")}
           </span>
         )}
@@ -76,7 +83,7 @@ export default function TodoItem({ todo }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors md:opacity-0 md:group-hover:opacity-100 hover:text-[#e94560]"
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560] md:opacity-0 md:group-hover:opacity-100"
         >
           삭제
         </button>
