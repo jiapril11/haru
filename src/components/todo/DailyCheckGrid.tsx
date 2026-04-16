@@ -36,7 +36,7 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
     });
   }
   return (
-    <div className="mt-2 pl-8">
+    <div className="mt-2">
       {/* 날짜 그리드 */}
       <div className="mb-2 flex flex-wrap gap-1.5">
         {days.map((day) => {

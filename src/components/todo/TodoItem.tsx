@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Todo } from "@/types";
-import { useToggleTodo, useDeleteTodo } from "@/hooks/useTodos";
+import { useToggleTodo, useDeleteTodo, useUpdateTodo } from "@/hooks/useTodos";
 import DailyCheckGrid from "./DailyCheckGrid";
 
 const priorityStyle = {
@@ -24,8 +25,109 @@ type Props = {
 export default function TodoItem({ todo, showDate = false }: Props) {
   const toggleTodo = useToggleTodo();
   const deleteTodo = useDeleteTodo();
+  const updateTodo = useUpdateTodo();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(todo.title);
+  const [editPriority, setEditPriority] = useState(todo.priority);
+  const [editDueDate, setEditDueDate] = useState(todo.due_date ?? "");
+  const [editStartDate, setEditStartDate] = useState(todo.start_date ?? "");
 
   const isRange = !!todo.start_date && !!todo.due_date;
+
+  function handleSave() {
+    if (!editTitle.trim()) return;
+    updateTodo.mutate(
+      {
+        id: todo.id,
+        title: editTitle.trim(),
+        priority: editPriority,
+        ...(isRange
+          ? { start_date: editStartDate || null, due_date: editDueDate || null }
+          : { due_date: editDueDate || null }),
+      },
+      { onSuccess: () => setIsEditing(false) },
+    );
+  }
+
+  function handleCancel() {
+    setEditTitle(todo.title);
+    setEditPriority(todo.priority);
+    setEditDueDate(todo.due_date ?? "");
+    setEditStartDate(todo.start_date ?? "");
+    setIsEditing(false);
+  }
+
+  if (isEditing) {
+    return (
+      <div className="rounded-xl border border-[var(--accent)] bg-[var(--surface)] px-4 py-3">
+        <div className="flex flex-col gap-2">
+          <input
+            autoFocus
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") handleCancel();
+            }}
+            className="w-full rounded-lg bg-[var(--surface2)] px-3 py-1.5 text-sm text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          />
+          <div className="flex items-center gap-2">
+            <select
+              value={editPriority}
+              onChange={(e) =>
+                setEditPriority(e.target.value as Todo["priority"])
+              }
+              className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            >
+              <option value="high">높음</option>
+              <option value="medium">보통</option>
+              <option value="low">낮음</option>
+            </select>
+            {isRange ? (
+              <>
+                <input
+                  type="date"
+                  value={editStartDate}
+                  onChange={(e) => setEditStartDate(e.target.value)}
+                  className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+                <span className="text-xs text-[var(--text-faint)]">~</span>
+                <input
+                  type="date"
+                  value={editDueDate}
+                  onChange={(e) => setEditDueDate(e.target.value)}
+                  className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+              </>
+            ) : (
+              <input
+                type="date"
+                value={editDueDate}
+                onChange={(e) => setEditDueDate(e.target.value)}
+                className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            )}
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={handleCancel}
+                className="cursor-pointer text-xs text-[var(--text-subtle)] hover:text-[var(--text)]"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={updateTodo.isPending}
+                className="cursor-pointer text-xs text-[var(--accent)] hover:opacity-80 disabled:opacity-50"
+              >
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="group rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
@@ -79,6 +181,14 @@ export default function TodoItem({ todo, showDate = false }: Props) {
         >
           {priorityLabel[todo.priority]}
         </span>
+
+        {/* 수정 */}
+        <button
+          onClick={() => setIsEditing(true)}
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)] md:opacity-0 md:group-hover:opacity-100"
+        >
+          수정
+        </button>
 
         {/* 삭제 */}
         <button

@@ -62,6 +62,22 @@ export function useToggleTodo() {
   });
 }
 
+export function useUpdateTodo() {
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...fields
+    }: Pick<Todo, "id"> & Partial<Pick<Todo, "title" | "priority" | "due_date" | "start_date">>) => {
+      const { error } = await supabase.from("todos").update(fields).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
+}
+
 export function useDeleteTodo() {
   const queryClient = useQueryClient();
   const supabase = createClient();
