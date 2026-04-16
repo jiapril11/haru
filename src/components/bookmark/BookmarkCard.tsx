@@ -5,6 +5,7 @@ import { Bookmark } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUpdateBookmark } from "@/hooks/useBookmarks";
 
 type Props = {
   bookmark: Bookmark;
@@ -14,7 +15,13 @@ export default function BookmarkCard({ bookmark }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const updateBookmark = useUpdateBookmark();
+
   const [isFavorite, setIsFavorite] = useState(bookmark.is_favorite);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(bookmark.title ?? "");
+  const [editDescription, setEditDescription] = useState(bookmark.description ?? "");
+  const [editTagsRaw, setEditTagsRaw] = useState(bookmark.tags.join(", "));
 
   async function handleFavorite() {
     setIsFavorite((prev) => !prev);
@@ -29,6 +36,74 @@ export default function BookmarkCard({ bookmark }: Props) {
     await supabase.from("bookmarks").delete().eq("id", bookmark.id);
     queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
   }
+
+  function handleSave() {
+    updateBookmark.mutate(
+      {
+        id: bookmark.id,
+        title: editTitle.trim() || null,
+        description: editDescription.trim() || null,
+        tags: editTagsRaw
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+      },
+      { onSuccess: () => setIsEditing(false) },
+    );
+  }
+
+  function handleCancel() {
+    setEditTitle(bookmark.title ?? "");
+    setEditDescription(bookmark.description ?? "");
+    setEditTagsRaw(bookmark.tags.join(", "));
+    setIsEditing(false);
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex flex-col rounded-xl border border-[var(--accent)] bg-[var(--surface)] p-4">
+        <div className="flex flex-col gap-2">
+          <input
+            autoFocus
+            placeholder="제목"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Escape" && handleCancel()}
+            className="w-full rounded-lg bg-[var(--surface2)] px-3 py-1.5 text-sm text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          />
+          <textarea
+            placeholder="설명"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={2}
+            className="w-full resize-none rounded-lg bg-[var(--surface2)] px-3 py-1.5 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          />
+          <input
+            placeholder="태그 (쉼표로 구분)"
+            value={editTagsRaw}
+            onChange={(e) => setEditTagsRaw(e.target.value)}
+            className="w-full rounded-lg bg-[var(--surface2)] px-3 py-1.5 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={handleCancel}
+              className="cursor-pointer text-xs text-[var(--text-subtle)] hover:text-[var(--text)]"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={updateBookmark.isPending}
+              className="cursor-pointer text-xs text-[var(--accent)] hover:opacity-80 disabled:opacity-50"
+            >
+              저장
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="group flex flex-col rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border)]">
       <div className="mb-3 flex items-center gap-2">
@@ -88,12 +163,20 @@ export default function BookmarkCard({ bookmark }: Props) {
         >
           열기 →
         </a>
-        <button
-          onClick={handleDelete}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
-        >
-          삭제
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsEditing(true)}
+            className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
+          >
+            수정
+          </button>
+          <button
+            onClick={handleDelete}
+            className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
+          >
+            삭제
+          </button>
+        </div>
       </div>
     </div>
   );

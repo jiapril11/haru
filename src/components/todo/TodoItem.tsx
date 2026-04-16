@@ -145,7 +145,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
             }`}
           >
             {todo.is_done && (
-              <span className="text-xs text-[var(--text)]">✓</span>
+              <span className="text-xs text-white">✓</span>
             )}
           </button>
         )}
