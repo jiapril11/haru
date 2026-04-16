@@ -35,32 +35,40 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
       checked: checkedDates.has(date),
     });
   }
-  return (
-    <div className="mt-2">
-      {/* 날짜 그리드 */}
-      <div className="mb-2 flex flex-wrap gap-1.5">
-        {days.map((day) => {
-          const dateStr = formatDate(day, "yyyy-MM-dd");
-          const isChecked = checkedDates.has(dateStr);
-          const isFutureDay = isFuture(day);
 
-          return (
-            <button
-              key={dateStr}
-              onClick={() => !isFutureDay && handleToggle(dateStr)}
-              disabled={isFutureDay}
-              title={format(day, "M월 d일 (EEE)", { locale: ko })}
-              className={`h-5 w-5 rounded-md text-xs font-medium transition-colors ${
-                isChecked
-                  ? "bg-emerald-500 text-[var(--text)]"
-                  : isFutureDay
-                    ? "cursor-not-allowed bg-[var(--border)] text-[var(--text-faint)]"
-                    : "cursor-pointer bg-[var(--border)] text-[var(--text-subtle)] hover:bg-[var(--text-faint)]"
-              }`}
-            ></button>
-          );
-        })}
+  return (
+    <div className="mt-4">
+      {/* 버튼 그리드 + 기간 날짜 */}
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-1.5">
+          {days.map((day) => {
+            const dateStr = formatDate(day, "yyyy-MM-dd");
+            const isChecked = checkedDates.has(dateStr);
+            const isFutureDay = isFuture(day);
+
+            return (
+              <button
+                key={dateStr}
+                onClick={() => !isFutureDay && handleToggle(dateStr)}
+                disabled={isFutureDay}
+                title={format(day, "M월 d일 (EEE)", { locale: ko })}
+                className={`h-5 w-5 rounded-md text-xs font-medium transition-colors ${
+                  isChecked
+                    ? "bg-emerald-500 text-[var(--text)]"
+                    : isFutureDay
+                      ? "cursor-not-allowed bg-[var(--border)] text-[var(--text-faint)]"
+                      : "cursor-pointer bg-[var(--border)] text-[var(--text-subtle)] hover:bg-[var(--text-faint)]"
+                }`}
+              ></button>
+            );
+          })}
+        </div>
+        <span className="text-xs text-[var(--text-faint)]">
+          {startDate.slice(5).replace("-", "/")} ~{" "}
+          {endDate.slice(5).replace("-", "/")}
+        </span>
       </div>
+
       {/* 진행률 */}
       <div className="flex items-center gap-2">
         <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--border)]">
@@ -70,7 +78,7 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
           />
         </div>
         <span className="text-xs text-[var(--text-subtle)]">
-          {completedCount}/{days.length}일
+          {Math.round((completedCount / days.length) * 100)}%
         </span>
       </div>
     </div>

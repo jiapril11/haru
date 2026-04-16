@@ -150,6 +150,15 @@ export default function TodoItem({ todo, showDate = false }: Props) {
           </button>
         )}
 
+        {/* 우선순위 */}
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
+            priorityStyle[todo.priority]
+          }`}
+        >
+          {priorityLabel[todo.priority]}
+        </span>
+
         {/* 제목 */}
         <span
           className={`flex-1 text-sm ${
@@ -161,31 +170,17 @@ export default function TodoItem({ todo, showDate = false }: Props) {
           {todo.title}
         </span>
 
-        {/* 기간 표시 */}
-        {isRange ? (
-          <span className="text-xs text-[var(--text-subtle)]">
-            {todo.start_date?.slice(5).replace("-", "/")} ~{" "}
-            {todo.due_date?.slice(5).replace("-", "/")}
-          </span>
-        ) : showDate && (
+        {/* 단일 날짜 표시 */}
+        {!isRange && showDate && (
           <span className="text-xs text-[var(--text-subtle)]">
             {todo.due_date?.slice(5).replace("-", "/")}
           </span>
         )}
 
-        {/* 우선순위 */}
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs ${
-            priorityStyle[todo.priority]
-          }`}
-        >
-          {priorityLabel[todo.priority]}
-        </span>
-
         {/* 수정 */}
         <button
           onClick={() => setIsEditing(true)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)] md:opacity-0 md:group-hover:opacity-100"
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
         >
           수정
         </button>
@@ -193,7 +188,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560] md:opacity-0 md:group-hover:opacity-100"
+          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
         >
           삭제
         </button>
