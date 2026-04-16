@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const menus = [
-  { label: "북마크", href: "/bookmarks", icon: "🔖" },
   { label: "할일", href: "/todos", icon: "✅" },
+  { label: "북마크", href: "/bookmarks", icon: "🔖" },
 ];
 
 interface SidebarProps {

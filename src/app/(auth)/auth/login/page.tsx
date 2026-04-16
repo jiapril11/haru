@@ -29,7 +29,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       } else {
-        router.push("/bookmarks");
+        router.push("/todos");
         router.refresh();
       }
     } else {
@@ -49,7 +49,9 @@ export default function LoginPage() {
         <h1 className="text-3xl font-bold text-[var(--text)]">
           Haru<span className="text-[#e94560]">.</span>
         </h1>
-        <p className="mt-2 text-sm text-[var(--text-subtle)]">북마크와 투두를 한 곳에서</p>
+        <p className="mt-2 text-sm text-[var(--text-subtle)]">
+          북마크와 투두를 한 곳에서
+        </p>
       </div>
 
       {/* card */}
@@ -78,7 +80,9 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-xs text-[var(--text-muted)]">이메일</label>
+            <label className="mb-1.5 block text-xs text-[var(--text-muted)]">
+              이메일
+            </label>
             <input
               type="email"
               value={email}

@@ -32,14 +32,14 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthPage = pathname.startsWith("/auth");
   const isAppPage =
-    pathname.startsWith("/bookmarks") || pathname.startsWith("/todos");
+    pathname.startsWith("/todos") || pathname.startsWith("/bookmarks");
 
   if (!user && isAppPage) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
   if (user && isAuthPage) {
-    return NextResponse.redirect(new URL("/bookmarks", request.url));
+    return NextResponse.redirect(new URL("/todos", request.url));
   }
 
   return supabaseResponse;
