@@ -104,7 +104,11 @@ export default function TodosPage() {
             mobileView === "all"
               ? (todos ?? [])
               : (todos?.filter((t) =>
-                  filterByView(t.due_date, mobileView as TodoView, t.start_date),
+                  filterByView(
+                    t.due_date,
+                    mobileView as TodoView,
+                    t.start_date,
+                  ),
                 ) ?? []),
           );
   const mobileUndone = mobileFiltered.filter((t) => !t.is_done);
@@ -223,7 +227,7 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex w-full flex-col pb-2 md:h-full md:pb-0">
       {/* 헤더 */}
       <div className="mt-4 mb-6 shrink-0">
         <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>

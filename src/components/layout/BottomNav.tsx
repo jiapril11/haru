@@ -12,7 +12,10 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[var(--surface)] border-t border-[var(--border)] flex items-center md:hidden z-50">
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] flex items-center md:hidden z-50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       {menus.map((menu) => (
         <Link
           key={menu.href}
