@@ -62,33 +62,53 @@ export default function TodosPage() {
   const todayTodos =
     todos?.filter((t) => filterByView(t.due_date, "today", t.start_date)) ?? [];
   const todayUndone = todayTodos.filter((t) => !t.is_done);
-  const todayDone = todayTodos.filter((t) => t.is_done);
+  const todayDone = sortDoneByDate(todayTodos.filter((t) => t.is_done));
+
+  function sortDoneByDate(list: Todo[]) {
+    return [...list].sort((a, b) => {
+      const aDate = a.due_date ?? "";
+      const bDate = b.due_date ?? "";
+      return bDate.localeCompare(aDate);
+    });
+  }
+
+  function sortByDate(list: Todo[]) {
+    return [...list].sort((a, b) => {
+      const aDate = a.start_date ?? a.due_date ?? "";
+      const bDate = b.start_date ?? b.due_date ?? "";
+      if (aDate !== bDate) return aDate.localeCompare(bDate);
+      return a.sort_order - b.sort_order;
+    });
+  }
 
   // 오른쪽 탭 데이터
-  const rightFiltered =
+  const rightFiltered = sortByDate(
     rightView === "calendar"
       ? []
       : rightView === "all"
         ? (todos ?? [])
         : (todos?.filter((t) =>
             filterByView(t.due_date, rightView as TodoView, t.start_date),
-          ) ?? []);
+          ) ?? []),
+  );
   const rightUndone = rightFiltered.filter((t) => !t.is_done);
-  const rightDone = rightFiltered.filter((t) => t.is_done);
+  const rightDone = sortDoneByDate(rightFiltered.filter((t) => t.is_done));
 
   // 모바일 데이터
   const mobileFiltered =
     mobileView === "calendar"
       ? []
-      : mobileView === "all"
-        ? (todos ?? [])
-        : mobileView === "today"
-          ? todayTodos
-          : (todos?.filter((t) =>
-              filterByView(t.due_date, mobileView as TodoView, t.start_date),
-            ) ?? []);
+      : mobileView === "today"
+        ? todayTodos
+        : sortByDate(
+            mobileView === "all"
+              ? (todos ?? [])
+              : (todos?.filter((t) =>
+                  filterByView(t.due_date, mobileView as TodoView, t.start_date),
+                ) ?? []),
+          );
   const mobileUndone = mobileFiltered.filter((t) => !t.is_done);
-  const mobileDone = mobileFiltered.filter((t) => t.is_done);
+  const mobileDone = sortDoneByDate(mobileFiltered.filter((t) => t.is_done));
 
   const calendarTodos = selectedDate
     ? (todos?.filter((t) => {

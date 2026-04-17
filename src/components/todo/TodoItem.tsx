@@ -162,7 +162,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
         {/* 제목 */}
         <span
           className={`flex-1 text-sm ${
-            !isRange && todo.is_done
+            todo.is_done
               ? "text-[var(--text-subtle)] line-through"
               : "text-[var(--text)]"
           }`}
@@ -200,6 +200,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
           todoId={todo.id}
           startDate={todo.start_date!}
           endDate={todo.due_date!}
+          isDone={todo.is_done}
         />
       )}
     </div>

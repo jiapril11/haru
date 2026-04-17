@@ -1,6 +1,6 @@
 "use client";
 
-import { useDailyChecks, useToggleDailyCheck } from "@/hooks/useTodos";
+import { useDailyChecks, useToggleDailyCheck, useToggleTodo } from "@/hooks/useTodos";
 import {
   eachDayOfInterval,
   format,
@@ -14,11 +14,13 @@ type Props = {
   todoId: string;
   startDate: string;
   endDate: string;
+  isDone: boolean;
 };
 
-export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
+export default function DailyCheckGrid({ todoId, startDate, endDate, isDone }: Props) {
   const { data: checks = [] } = useDailyChecks(todoId);
   const toggleCheck = useToggleDailyCheck();
+  const toggleTodo = useToggleTodo();
 
   const days = eachDayOfInterval({
     start: parseISO(startDate),
@@ -29,11 +31,19 @@ export default function DailyCheckGrid({ todoId, startDate, endDate }: Props) {
   const completedCount = checkedDates.size;
 
   function handleToggle(date: string) {
-    toggleCheck.mutate({
-      todoId,
-      date,
-      checked: checkedDates.has(date),
-    });
+    const wasChecked = checkedDates.has(date);
+    toggleCheck.mutate(
+      { todoId, date, checked: wasChecked },
+      {
+        onSuccess: () => {
+          const newCount = wasChecked ? completedCount - 1 : completedCount + 1;
+          const allDone = newCount === days.length;
+          if (allDone !== isDone) {
+            toggleTodo.mutate({ id: todoId, is_done: allDone });
+          }
+        },
+      },
+    );
   }
 
   return (
