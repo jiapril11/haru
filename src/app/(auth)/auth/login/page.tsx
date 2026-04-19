@@ -27,15 +27,20 @@ export default function LoginPage() {
         password,
       });
       if (error) {
-        setError(error.message);
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
       } else {
         router.push("/todos");
         router.refresh();
       }
     } else {
+      if (password.length < 6) {
+        setError("비밀번호는 6자 이상이어야 합니다.");
+        setLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        setError(error.message);
+        setError("회원가입에 실패했습니다. 다시 시도해주세요.");
       } else {
         setMessage("가입 확인 이메일을 보냈습니다. 이메일을 확인해주세요");
       }
