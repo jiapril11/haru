@@ -38,7 +38,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  if (user && isAuthPage) {
+  const isResetPage = pathname === "/auth/reset-password";
+
+  if (user && isAuthPage && !isResetPage) {
     return NextResponse.redirect(new URL("/todos", request.url));
   }
 
