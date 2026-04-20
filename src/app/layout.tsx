@@ -13,7 +13,7 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Haru",
+  title: "하루",
   description: "북마크와 투두를 한 곳에서",
 };
 
