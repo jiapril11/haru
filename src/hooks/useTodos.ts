@@ -1,5 +1,4 @@
 import {
-  QueryClient,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -36,9 +35,18 @@ export function useAddTodo() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("로그인이 필요합니다");
+
+      const { data: existing } = await supabase
+        .from("todos")
+        .select("sort_order")
+        .order("sort_order", { ascending: true })
+        .limit(1);
+      const minOrder = existing?.[0]?.sort_order ?? 0;
+
       const { error } = await supabase.from("todos").insert({
         ...todo,
         user_id: user.id,
+        sort_order: minOrder - 1,
       });
       if (error) throw error;
     },
@@ -102,7 +110,24 @@ export function useUpdateTodoOrder() {
       );
       await Promise.all(updates);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+    onMutate: async (newOrder) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previous = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(["todos"], (old) => {
+        if (!old) return old;
+        const orderMap = new Map(newOrder.map((t) => [t.id, t.sort_order]));
+        return old
+          .map((t) => ({ ...t, sort_order: orderMap.get(t.id) ?? t.sort_order }))
+          .sort((a, b) => a.sort_order - b.sort_order);
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["todos"], context.previous);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
   });
 }
 

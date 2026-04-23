@@ -1,4 +1,33 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://haru.vercel.app";
+
+export const metadata: Metadata = {
+  title: "Haru — 북마크 & 투두 관리",
+  description:
+    "중요한 링크와 할일을 한 곳에서 관리하세요. 스마트 북마크와 투두 리스트로 하루를 더 잘 정리하세요.",
+  alternates: {
+    canonical: siteUrl,
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Haru",
+  url: siteUrl,
+  description:
+    "중요한 링크와 할일을 한 곳에서 관리하세요. 스마트 북마크와 투두 리스트로 하루를 더 잘 정리하세요.",
+  applicationCategory: "ProductivityApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "KRW",
+  },
+  featureList: ["스마트 북마크 저장", "투두 리스트", "달력 뷰", "드래그 순서 변경"],
+};
 
 const features = [
   {
@@ -24,6 +53,10 @@ const features = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* 네비게이션 */}
       <nav className="flex items-center justify-between border-b border-white/5 px-4 py-4 md:px-8 md:py-5">
         <Link href={"/"} className="text-lg font-bold">
