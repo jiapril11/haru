@@ -71,7 +71,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+          redirectTo: "/auth/callback?next=/auth/reset-password",
         }),
       });
       const data = await res.json();

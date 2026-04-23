@@ -14,11 +14,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "URL이 필요합니다." }, { status: 400 });
   }
 
-  // 내부 IP 및 localhost 차단 (SSRF 방지)
+  // SSRF 방지: HTTPS 강제 + 내부 IP 차단 (IPv4 / IPv6 / 클라우드 메타데이터)
   try {
-    const { hostname } = new URL(url);
-    const blocked = /^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(hostname);
-    if (blocked) {
+    const { hostname, protocol } = new URL(url);
+
+    if (protocol !== "https:") {
+      return NextResponse.json({ error: "HTTPS URL만 허용됩니다." }, { status: 400 });
+    }
+
+    const ipv4Blocked =
+      /^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.)/.test(hostname);
+    // IPv6 localhost 및 link-local
+    const ipv6Blocked = /^(\[?(::1|::ffff:|fe80:))/i.test(hostname);
+
+    if (ipv4Blocked || ipv6Blocked) {
       return NextResponse.json({ error: "허용되지 않는 URL입니다." }, { status: 400 });
     }
   } catch {

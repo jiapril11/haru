@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
-  const next = request.nextUrl.searchParams.get("next") ?? "/auth/reset-password";
+  const raw = request.nextUrl.searchParams.get("next") ?? "/auth/reset-password";
+  // Open Redirect 방지: 상대 경로만 허용
+  const next = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/";
 
   if (code) {
     const supabase = await createClient();
