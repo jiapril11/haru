@@ -13,6 +13,27 @@ const prioritySelectStyle = {
   low: "border-blue-400 text-blue-400 focus:ring-blue-400",
 };
 
+const dateInputClass =
+  "rounded-lg border border-[var(--border)] bg-[var(--bg)] py-1.5 pl-2 pr-8 text-xs text-(--text-muted) focus:outline-none";
+
+const CalendarIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
 export default function AddTodoForm() {
   const addTodo = useAddTodo();
   const [title, setTitle] = useState("");
@@ -46,7 +67,7 @@ export default function AddTodoForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full cursor-pointer rounded-xl border border-dashed border-[var(--border)] py-3 text-sm text-[var(--text-subtle)] transition-colors hover:border-[var(--border)] hover:text-[var(--text-muted)]"
+        className="w-full cursor-pointer rounded-xl border border-dashed border-[var(--border)] py-3 text-sm text-[var(--text-subtle)] transition-colors hover:border-[var(--border)] hover:text-(--text-muted)"
       >
         + 할일 추가
       </button>
@@ -106,24 +127,10 @@ export default function AddTodoForm() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
+                className={dateInputClass}
               />
-              <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+                <CalendarIcon />
               </div>
             </label>
             <span className="text-xs text-[var(--text-subtle)]">~</span>
@@ -132,24 +139,10 @@ export default function AddTodoForm() {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
+                className={dateInputClass}
               />
-              <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+                <CalendarIcon />
               </div>
             </label>
           </div>
@@ -159,24 +152,10 @@ export default function AddTodoForm() {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
+              className={dateInputClass}
             />
-            <div className="pointer-events-none absolute top-[9px] right-[12px] cursor-pointer">
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
+            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+              <CalendarIcon />
             </div>
           </label>
         )}
