@@ -154,7 +154,7 @@ export default function BookmarkCard({ bookmark }: Props) {
         </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-3 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+      <div className="mt-auto flex items-center justify-between pt-3 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
         <a
           href={bookmark.url}
           target="_blank"
@@ -166,13 +166,13 @@ export default function BookmarkCard({ bookmark }: Props) {
         <div className="flex gap-3">
           <button
             onClick={() => setIsEditing(true)}
-            className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
+            className="cursor-pointer text-[12px]! text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
           >
             수정
           </button>
           <button
             onClick={handleDelete}
-            className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
+            className="cursor-pointer text-[12px]! text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
           >
             삭제
           </button>

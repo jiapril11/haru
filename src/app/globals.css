@@ -12,7 +12,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* iOS Safari 입력 시 자동 확대 방지 (iPad 포함) */
 @media (max-width: 1024px) {
-  input, select, textarea, button {
+  input, select, textarea {
     font-size: 16px;
   }
 }
