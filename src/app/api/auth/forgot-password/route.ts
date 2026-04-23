@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   // admin API로 이메일 존재 여부 확인
   const { data, error } = await supabase.auth.admin.listUsers();
   if (error) {
-    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   const exists = data.users.some((u) => u.email === email);
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   // 존재하면 재설정 메일 발송
   const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   if (resetError) {
-    return NextResponse.json({ error: "이메일 전송에 실패했습니다. 다시 시도해주세요." }, { status: 500 });
+    return NextResponse.json({ error: resetError.message }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
