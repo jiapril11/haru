@@ -42,3 +42,6 @@ next-env.d.ts
 
 #memo
 memo.txt
+
+#vscode
+settings.json
