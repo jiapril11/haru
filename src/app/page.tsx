@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PwaInstallBanner from "@/components/PwaInstallBanner";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://haru.vercel.app";
 
@@ -94,6 +95,8 @@ export default function LandingPage() {
         >
           무료로 시작하기 →
         </Link>
+
+        <PwaInstallBanner />
       </section>
 
       {/* 기능 소개 */}

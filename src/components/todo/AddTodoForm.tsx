@@ -7,6 +7,12 @@ import { useState } from "react";
 
 const todayStr = format(new Date(), "yyyy-MM-dd");
 
+const prioritySelectStyle = {
+  high: "border-red-500 text-red-400 focus:ring-red-500",
+  medium: "border-yellow-500 text-yellow-400 focus:ring-yellow-500",
+  low: "border-blue-400 text-blue-400 focus:ring-blue-400",
+};
+
 export default function AddTodoForm() {
   const addTodo = useAddTodo();
   const [title, setTitle] = useState("");
@@ -15,10 +21,14 @@ export default function AddTodoForm() {
   const [startDate, setStartDate] = useState("");
   const [isRange, setIsRange] = useState(false);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setError("할일 내용을 입력해주세요.");
+      return;
+    }
     await addTodo.mutateAsync({
       title: title.trim(),
       priority,
@@ -52,17 +62,18 @@ export default function AddTodoForm() {
         autoFocus
         type="text"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => { setTitle(e.target.value); setError(""); }}
         placeholder="할일을 입력하세요"
         className="bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:outline-none"
       />
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
       <div className="flex flex-wrap items-center gap-3">
         {/* 우선순위 */}
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as Todo["priority"])}
-          className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-xs text-[var(--text-muted)] focus:outline-none"
+          className={`rounded-lg border bg-(--bg) px-2 py-1.5 text-xs outline-none focus:ring-1 ${prioritySelectStyle[priority]}`}
         >
           <option value="high">높음</option>
           <option value="medium">보통</option>

@@ -147,6 +147,7 @@ export default function TodosPage() {
     showAddForm = false,
     showDate = false,
     showOverdue = false,
+    defaultDoneOpen = false,
   }: {
     undone: Todo[];
     done: Todo[];
@@ -154,8 +155,9 @@ export default function TodosPage() {
     showAddForm?: boolean;
     showDate?: boolean;
     showOverdue?: boolean;
+    defaultDoneOpen?: boolean;
   }) {
-    const [doneOpen, setDoneOpen] = useState(false);
+    const [doneOpen, setDoneOpen] = useState(defaultDoneOpen);
     const [overdueOpen, setOverdueOpen] = useState(false);
 
     const today = format(new Date(), "yyyy-MM-dd");
@@ -331,6 +333,7 @@ export default function TodosPage() {
                 done={todayDone}
                 filtered={todayTodos}
                 showAddForm
+                defaultDoneOpen
               />
             </div>
 

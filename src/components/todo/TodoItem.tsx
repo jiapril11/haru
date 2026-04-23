@@ -5,16 +5,16 @@ import { Todo } from "@/types";
 import { useToggleTodo, useDeleteTodo, useUpdateTodo } from "@/hooks/useTodos";
 import DailyCheckGrid from "./DailyCheckGrid";
 
-const priorityStyle = {
-  high: "bg-red-500/20 text-red-400",
-  medium: "bg-yellow-500/20 text-yellow-400",
-  low: "bg-blue-500/20 text-blue-400",
+const priorityBorder = {
+  high: "border-l-red-500",
+  medium: "border-l-yellow-500",
+  low: "border-l-blue-400",
 };
 
-const priorityLabel = {
-  high: "높음",
-  medium: "보통",
-  low: "낮음",
+const prioritySelectStyle = {
+  high: "border-red-500 text-red-400 focus:ring-red-500",
+  medium: "border-yellow-500 text-yellow-400 focus:ring-yellow-500",
+  low: "border-blue-400 text-blue-400 focus:ring-blue-400",
 };
 
 type Props = {
@@ -28,6 +28,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
   const updateTodo = useUpdateTodo();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [editError, setEditError] = useState("");
   const [editTitle, setEditTitle] = useState(todo.title);
   const [editPriority, setEditPriority] = useState(todo.priority);
   const [editDueDate, setEditDueDate] = useState(todo.due_date ?? "");
@@ -36,7 +37,11 @@ export default function TodoItem({ todo, showDate = false }: Props) {
   const isRange = !!todo.start_date && !!todo.due_date;
 
   function handleSave() {
-    if (!editTitle.trim()) return;
+    if (!editTitle.trim()) {
+      setEditError("할일 내용을 입력해주세요.");
+      return;
+    }
+    setEditError("");
     updateTodo.mutate(
       {
         id: todo.id,
@@ -65,20 +70,21 @@ export default function TodoItem({ todo, showDate = false }: Props) {
           <input
             autoFocus
             value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
+            onChange={(e) => { setEditTitle(e.target.value); setEditError(""); }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
               if (e.key === "Escape") handleCancel();
             }}
             className="w-full rounded-lg bg-[var(--surface2)] px-3 py-1.5 text-sm text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
           />
+          {editError && <p className="text-xs text-red-400">{editError}</p>}
           <div className="flex items-center gap-2">
             <select
               value={editPriority}
               onChange={(e) =>
                 setEditPriority(e.target.value as Todo["priority"])
               }
-              className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className={`rounded-lg border bg-(--surface2) px-2 py-1 text-xs outline-none focus:ring-1 ${prioritySelectStyle[editPriority]}`}
             >
               <option value="high">높음</option>
               <option value="medium">보통</option>
@@ -130,7 +136,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
   }
 
   return (
-    <div className="group rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+    <div className={`group rounded-xl border border-(--border) border-l-4 bg-(--surface) px-4 py-3 ${priorityBorder[todo.priority]}`}>
       <div className="flex items-center gap-3">
         {/* 체크박스 — 기간 투두는 숨김 */}
         {!isRange && (
@@ -149,15 +155,6 @@ export default function TodoItem({ todo, showDate = false }: Props) {
             )}
           </button>
         )}
-
-        {/* 우선순위 */}
-        <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
-            priorityStyle[todo.priority]
-          }`}
-        >
-          {priorityLabel[todo.priority]}
-        </span>
 
         {/* 제목 */}
         <span
