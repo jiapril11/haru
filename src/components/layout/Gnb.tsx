@@ -16,6 +16,7 @@ export default function Gnb() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const [iosGuideOpen, setIosGuideOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const supabase = createClient();
@@ -23,8 +24,17 @@ export default function Gnb() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
+  const isInstalled =
+    typeof window !== "undefined" &&
+    window.matchMedia("(display-mode: standalone)").matches;
+
+  const isIos =
+    typeof window !== "undefined" &&
+    /iphone|ipad|ipod/i.test(navigator.userAgent) &&
+    /safari/i.test(navigator.userAgent) &&
+    !/crios|fxios/i.test(navigator.userAgent);
+
   useEffect(() => {
-    const isInstalled = window.matchMedia("(display-mode: standalone)").matches;
     if (isInstalled) return;
     const handler = (e: Event) => {
       e.preventDefault();
@@ -32,7 +42,7 @@ export default function Gnb() {
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
+  }, [isInstalled]);
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -113,8 +123,8 @@ export default function Gnb() {
               </button>
             )}
 
-            {/* PWA 설치 */}
-            {installEvent && (
+            {/* PWA 설치 - Chrome/Android */}
+            {!isInstalled && installEvent && (
               <button
                 onClick={handleInstall}
                 className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-(--text-muted) transition-colors hover:bg-(--surface2) hover:text-(--text)"
@@ -122,6 +132,39 @@ export default function Gnb() {
                 <Download size={16} />
                 앱 설치
               </button>
+            )}
+
+            {/* PWA 설치 - iOS Safari */}
+            {!isInstalled && isIos && (
+              <>
+                <button
+                  onClick={() => setIosGuideOpen((v) => !v)}
+                  className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-(--text-muted) transition-colors hover:bg-(--surface2) hover:text-(--text)"
+                >
+                  <Download size={16} />
+                  앱 설치 {iosGuideOpen ? "▴" : "▾"}
+                </button>
+                {iosGuideOpen && (
+                  <ol className="flex flex-col gap-1.5 bg-(--surface2) px-4 py-3 text-xs text-(--text-subtle)">
+                    <li className="flex items-start gap-2">
+                      <span className="shrink-0 font-bold text-(--primary)">1.</span>
+                      하단 공유{" "}
+                      <svg viewBox="0 0 24 24" className="inline h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2}>
+                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>{" "}
+                      버튼 탭
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="shrink-0 font-bold text-(--primary)">2.</span>
+                      <span><span className="font-medium text-(--text)">홈 화면에 추가</span> 선택</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="shrink-0 font-bold text-(--primary)">3.</span>
+                      <span>오른쪽 위 <span className="font-medium text-(--text)">추가</span> 탭</span>
+                    </li>
+                  </ol>
+                )}
+              </>
             )}
 
             {/* 구분선 */}
