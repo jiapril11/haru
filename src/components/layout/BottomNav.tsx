@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menus = [
-  { label: "북마크", href: "/bookmarks", icon: "🔖" },
   { label: "할일", href: "/todos", icon: "✅" },
+  { label: "북마크", href: "/bookmarks", icon: "🔖" },
 ];
 
 export default function BottomNav() {
