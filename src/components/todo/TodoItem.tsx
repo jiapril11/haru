@@ -177,7 +177,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
         {/* 수정 */}
         <button
           onClick={() => setIsEditing(true)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
+          className="cursor-pointer text-[12px]! text-[var(--text-faint)] transition-colors hover:text-[var(--text)]"
         >
           수정
         </button>
@@ -185,7 +185,7 @@ export default function TodoItem({ todo, showDate = false }: Props) {
         {/* 삭제 */}
         <button
           onClick={() => deleteTodo.mutate(todo.id)}
-          className="cursor-pointer text-xs text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
+          className="cursor-pointer text-[12px]! text-[var(--text-faint)] transition-colors hover:text-[#e94560]"
         >
           삭제
         </button>
