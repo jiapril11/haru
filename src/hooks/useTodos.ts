@@ -36,9 +36,18 @@ export function useAddTodo() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("로그인이 필요합니다");
+
+      const { data: existing } = await supabase
+        .from("todos")
+        .select("sort_order")
+        .order("sort_order", { ascending: true })
+        .limit(1);
+      const minOrder = existing?.[0]?.sort_order ?? 0;
+
       const { error } = await supabase.from("todos").insert({
         ...todo,
         user_id: user.id,
+        sort_order: minOrder - 1,
       });
       if (error) throw error;
     },
