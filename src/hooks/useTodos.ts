@@ -1,5 +1,4 @@
 import {
-  QueryClient,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -111,7 +110,24 @@ export function useUpdateTodoOrder() {
       );
       await Promise.all(updates);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+    onMutate: async (newOrder) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previous = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(["todos"], (old) => {
+        if (!old) return old;
+        const orderMap = new Map(newOrder.map((t) => [t.id, t.sort_order]));
+        return old
+          .map((t) => ({ ...t, sort_order: orderMap.get(t.id) ?? t.sort_order }))
+          .sort((a, b) => a.sort_order - b.sort_order);
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["todos"], context.previous);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
   });
 }
 
