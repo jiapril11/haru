@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { useEffect, useState } from "react";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 const menus = [
   { label: "할일", href: "/todos", icon: "✅" },
@@ -16,6 +22,32 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const isInstalled =
+    typeof window !== "undefined" &&
+    window.matchMedia("(display-mode: standalone)").matches;
+
+  useEffect(() => {
+    if (isInstalled) return;
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallEvent(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, [isInstalled]);
+
+  async function handleInstall() {
+    if (!installEvent) return;
+    await installEvent.prompt();
+    const { outcome } = await installEvent.userChoice;
+    if (outcome === "accepted") {
+      setInstallEvent(null);
+      window.open("/todos", "_blank");
+    }
+  }
+
+  const showInstall = !isInstalled && !!installEvent;
 
   return (
     <aside
@@ -40,6 +72,36 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </Link>
         ))}
       </nav>
+
+      {/* PWA 설치 버튼 */}
+      {showInstall && (
+        <div className="border-t border-[var(--border)] p-2">
+          {isCollapsed ? (
+            <button
+              onClick={handleInstall}
+              title="앱 설치"
+              className="flex w-full cursor-pointer items-center justify-center rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--border)] hover:text-[var(--text)]"
+            >
+              <Download size={16} />
+            </button>
+          ) : (
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3">
+              <p className="mb-1 text-xs font-medium text-[var(--text)]">앱으로 설치하기</p>
+              <p className="mb-2.5 text-[11px] text-[var(--text-faint)]">
+                홈 화면에 추가하면 더 빠르게 실행할 수 있어요.
+              </p>
+              <button
+                onClick={handleInstall}
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-(--accent) py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
+              >
+                <Download size={12} />
+                설치
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="border-t border-[var(--border)] p-2">
         <button
           onClick={onToggle}
