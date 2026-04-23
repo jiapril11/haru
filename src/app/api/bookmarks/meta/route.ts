@@ -74,8 +74,24 @@ export async function GET(request: NextRequest) {
     const title = getTag("og:title") ?? titleMatch?.[1]?.trim() ?? null;
     const description =
       getTag("og:description") ?? getNameTag("description") ?? null;
-    const { hostname } = new URL(url);
-    const favicon_url = `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+
+    const { hostname, origin } = new URL(url);
+
+    // HTML에서 favicon 링크 직접 파싱, 없으면 Google 서비스 폴백
+    const faviconMatch = html.match(
+      /<link[^>]*rel=["'][^"']*icon[^"']*["'][^>]*href=["']([^"']+)["']/i,
+    ) || html.match(
+      /<link[^>]*href=["']([^"']+)["'][^>]*rel=["'][^"']*icon[^"']*["']/i,
+    );
+    let favicon_url = `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+    if (faviconMatch?.[1]) {
+      const raw = faviconMatch[1];
+      favicon_url = raw.startsWith("http")
+        ? raw
+        : raw.startsWith("//")
+          ? `https:${raw}`
+          : `${origin}${raw.startsWith("/") ? raw : `/${raw}`}`;
+    }
 
     return NextResponse.json({ title, description, favicon_url });
   } catch {
