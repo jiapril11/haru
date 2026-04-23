@@ -107,7 +107,14 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           onClick={onToggle}
           className="flex w-full cursor-pointer items-center justify-center rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--border)] hover:text-[var(--text)]"
         >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {isCollapsed ? (
+            <ChevronRight size={16} />
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs">
+              <ChevronLeft size={16} />
+              접기
+            </span>
+          )}
         </button>
       </div>
     </aside>
