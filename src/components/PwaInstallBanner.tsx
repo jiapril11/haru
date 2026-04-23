@@ -49,7 +49,7 @@ export default function PwaInstallBanner() {
     <div className="mx-auto mt-8 max-w-sm rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4">
       <div className="mb-3 flex items-center gap-2">
         {/* PWA 배지 */}
-        <span className="rounded-full bg-(--accent)/10 px-2 py-0.5 text-[10px] font-medium text-(--accent)">
+        <span className="rounded-full bg-[#e94560]/15 px-2 py-0.5 text-[10px] font-medium text-[#e94560]">
           PWA
         </span>
         <p className="text-sm font-medium text-[var(--text)]">
