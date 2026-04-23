@@ -146,25 +146,46 @@ export default function TodosPage() {
     filtered,
     showAddForm = false,
     showDate = false,
+    showOverdue = false,
   }: {
     undone: Todo[];
     done: Todo[];
     filtered: Todo[];
     showAddForm?: boolean;
     showDate?: boolean;
+    showOverdue?: boolean;
   }) {
+    const [doneOpen, setDoneOpen] = useState(false);
+    const [overdueOpen, setOverdueOpen] = useState(false);
+
+    const today = format(new Date(), "yyyy-MM-dd");
+    const overdue = showOverdue
+      ? sortDoneByDate(
+          undone.filter((t) => {
+            const date = t.due_date ?? t.start_date;
+            return date && date < today;
+          }),
+        )
+      : [];
+    const activeUndone = showOverdue
+      ? undone.filter((t) => {
+          const date = t.due_date ?? t.start_date;
+          return !date || date >= today;
+        })
+      : undone;
+
     return (
       <div className="flex flex-col gap-2">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={makeDragHandler(undone)}
+          onDragEnd={makeDragHandler(activeUndone)}
         >
           <SortableContext
-            items={undone.map((t) => t.id)}
+            items={activeUndone.map((t) => t.id)}
             strategy={verticalListSortingStrategy}
           >
-            {undone.map((todo) => (
+            {activeUndone.map((todo) => (
               <SortableTodoItem key={todo.id} todo={todo} showDate={showDate} />
             ))}
           </SortableContext>
@@ -174,14 +195,39 @@ export default function TodosPage() {
 
         {done.length > 0 && (
           <div className="mt-4">
-            <p className="mb-2 text-xs text-[var(--text-faint)]">
-              완료 {done.length}개
-            </p>
-            <div className="flex flex-col gap-2">
-              {done.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} showDate={showDate} />
-              ))}
-            </div>
+            <button
+              onClick={() => setDoneOpen((v) => !v)}
+              className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-[var(--text-faint)] hover:text-[var(--text-subtle)]"
+            >
+              <span>{doneOpen ? "▾" : "▸"}</span>
+              <span>완료 {done.length}개</span>
+            </button>
+            {doneOpen && (
+              <div className="flex flex-col gap-2">
+                {done.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} showDate={showDate} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {overdue.length > 0 && (
+          <div className="mt-4">
+            <button
+              onClick={() => setOverdueOpen((v) => !v)}
+              className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-[var(--text-faint)] hover:text-[var(--text-subtle)]"
+            >
+              <span>{overdueOpen ? "▾" : "▸"}</span>
+              <span>미완료 {overdue.length}개</span>
+            </button>
+            {overdueOpen && (
+              <div className="flex flex-col gap-2">
+                {overdue.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} showDate={showDate} />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -265,6 +311,7 @@ export default function TodosPage() {
                 done={mobileDone}
                 filtered={mobileFiltered}
                 showAddForm
+                showOverdue={mobileView !== "today"}
               />
             )}
           </div>
@@ -342,6 +389,7 @@ export default function TodosPage() {
                   done={rightDone}
                   filtered={rightFiltered}
                   showDate
+                  showOverdue
                 />
               )}
             </div>
