@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/static-components */
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -24,6 +23,7 @@ import Calendar from "@/components/todo/Calendar";
 import { format, isSameDay, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Todo } from "@/types";
+import type { SensorDescriptor, SensorOptions } from "@dnd-kit/core";
 
 type MobileTab = TodoView | "all" | "calendar";
 type RightTab = "week" | "month" | "all" | "calendar";
@@ -43,6 +43,170 @@ const rightTabs: { label: string; value: RightTab }[] = [
   { label: "달력", value: "calendar" },
 ];
 
+function sortDoneByDate(list: Todo[]) {
+  return [...list].sort((a, b) => {
+    const aDate = a.due_date ?? "";
+    const bDate = b.due_date ?? "";
+    return bDate.localeCompare(aDate);
+  });
+}
+
+function sortByDate(list: Todo[]) {
+  return [...list].sort((a, b) => {
+    const aDate = a.start_date ?? a.due_date ?? "";
+    const bDate = b.start_date ?? b.due_date ?? "";
+    if (aDate !== bDate) return aDate.localeCompare(bDate);
+    return a.sort_order - b.sort_order;
+  });
+}
+
+type TodoListProps = {
+  undone: Todo[];
+  done: Todo[];
+  filtered: Todo[];
+  showAddForm?: boolean;
+  showDate?: boolean;
+  showOverdue?: boolean;
+  defaultDoneOpen?: boolean;
+  sensors: SensorDescriptor<SensorOptions>[];
+  onDragEnd: (event: DragEndEvent) => void;
+};
+
+function TodoList({
+  undone,
+  done,
+  filtered,
+  showAddForm = false,
+  showDate = false,
+  showOverdue = false,
+  defaultDoneOpen = false,
+  sensors,
+  onDragEnd,
+}: TodoListProps) {
+  const [doneOpen, setDoneOpen] = useState(defaultDoneOpen);
+  const [overdueOpen, setOverdueOpen] = useState(false);
+
+  const today = format(new Date(), "yyyy-MM-dd");
+  const overdue = showOverdue
+    ? sortDoneByDate(
+        undone.filter((t) => {
+          const date = t.due_date ?? t.start_date;
+          return date && date < today;
+        }),
+      )
+    : [];
+  const activeUndone = showOverdue
+    ? undone.filter((t) => {
+        const date = t.due_date ?? t.start_date;
+        return !date || date >= today;
+      })
+    : undone;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={onDragEnd}
+      >
+        <SortableContext
+          items={activeUndone.map((t) => t.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {activeUndone.map((todo) => (
+            <SortableTodoItem key={todo.id} todo={todo} showDate={showDate} />
+          ))}
+        </SortableContext>
+      </DndContext>
+
+      {showAddForm && <AddTodoForm />}
+
+      {done.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setDoneOpen((v) => !v)}
+            className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-(--text-faint) hover:text-(--text-subtle)"
+          >
+            <span>{doneOpen ? "▾" : "▸"}</span>
+            <span>완료 {done.length}개</span>
+          </button>
+          {doneOpen && (
+            <div className="flex flex-col gap-2">
+              {done.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} showDate={showDate} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {overdue.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setOverdueOpen((v) => !v)}
+            className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-(--text-faint) hover:text-(--text-subtle)"
+          >
+            <span>{overdueOpen ? "▾" : "▸"}</span>
+            <span>미완료 {overdue.length}개</span>
+          </button>
+          {overdueOpen && (
+            <div className="flex flex-col gap-2">
+              {overdue.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} showDate={showDate} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {filtered.length === 0 && (
+        <div className="py-16 text-center">
+          <p className="mb-3 text-3xl">✅</p>
+          <p className="text-sm text-(--text-subtle)">할일이 없어요!</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type CalendarViewProps = {
+  todos: Todo[];
+  selectedDate: Date | null;
+  onSelectDate: (date: Date) => void;
+  calendarTodos: Todo[];
+};
+
+function CalendarView({ todos, selectedDate, onSelectDate, calendarTodos }: CalendarViewProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <Calendar
+        todos={todos}
+        selectedDate={selectedDate}
+        onSelectDate={onSelectDate}
+      />
+      {selectedDate && (
+        <div>
+          <p className="mb-2 text-xs text-(--text-subtle)">
+            {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
+            {calendarTodos.length}개
+          </p>
+          {calendarTodos.length === 0 ? (
+            <p className="py-6 text-center text-sm text-(--text-faint)">
+              할일이 없어요
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {calendarTodos.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TodosPage() {
   const { data: todos, isLoading } = useTodos();
   const updateOrder = useUpdateTodoOrder();
@@ -50,7 +214,7 @@ export default function TodosPage() {
   const [mobileView, setMobileView] = useState<MobileTab>("today");
   const [rightView, setRightView] = useState<RightTab>("week");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [leftWidth, setLeftWidth] = useState(50); // 왼쪽 패널 너비 (%)
+  const [leftWidth, setLeftWidth] = useState(50);
 
   const isDragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,23 +227,6 @@ export default function TodosPage() {
     todos?.filter((t) => filterByView(t.due_date, "today", t.start_date)) ?? [];
   const todayUndone = todayTodos.filter((t) => !t.is_done);
   const todayDone = sortDoneByDate(todayTodos.filter((t) => t.is_done));
-
-  function sortDoneByDate(list: Todo[]) {
-    return [...list].sort((a, b) => {
-      const aDate = a.due_date ?? "";
-      const bDate = b.due_date ?? "";
-      return bDate.localeCompare(aDate);
-    });
-  }
-
-  function sortByDate(list: Todo[]) {
-    return [...list].sort((a, b) => {
-      const aDate = a.start_date ?? a.due_date ?? "";
-      const bDate = b.start_date ?? b.due_date ?? "";
-      if (aDate !== bDate) return aDate.localeCompare(bDate);
-      return a.sort_order - b.sort_order;
-    });
-  }
 
   // 오른쪽 탭 데이터
   const rightFiltered = sortByDate(
@@ -104,11 +251,7 @@ export default function TodosPage() {
             mobileView === "all"
               ? (todos ?? [])
               : (todos?.filter((t) =>
-                  filterByView(
-                    t.due_date,
-                    mobileView as TodoView,
-                    t.start_date,
-                  ),
+                  filterByView(t.due_date, mobileView as TodoView, t.start_date),
                 ) ?? []),
           );
   const mobileUndone = mobileFiltered.filter((t) => !t.is_done);
@@ -140,150 +283,15 @@ export default function TodosPage() {
     };
   }
 
-  function TodoList({
-    undone,
-    done,
-    filtered,
-    showAddForm = false,
-    showDate = false,
-    showOverdue = false,
-    defaultDoneOpen = false,
-  }: {
-    undone: Todo[];
-    done: Todo[];
-    filtered: Todo[];
-    showAddForm?: boolean;
-    showDate?: boolean;
-    showOverdue?: boolean;
-    defaultDoneOpen?: boolean;
-  }) {
-    const [doneOpen, setDoneOpen] = useState(defaultDoneOpen);
-    const [overdueOpen, setOverdueOpen] = useState(false);
-
-    const today = format(new Date(), "yyyy-MM-dd");
-    const overdue = showOverdue
-      ? sortDoneByDate(
-          undone.filter((t) => {
-            const date = t.due_date ?? t.start_date;
-            return date && date < today;
-          }),
-        )
-      : [];
-    const activeUndone = showOverdue
-      ? undone.filter((t) => {
-          const date = t.due_date ?? t.start_date;
-          return !date || date >= today;
-        })
-      : undone;
-
-    return (
-      <div className="flex flex-col gap-2">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={makeDragHandler(activeUndone)}
-        >
-          <SortableContext
-            items={activeUndone.map((t) => t.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {activeUndone.map((todo) => (
-              <SortableTodoItem key={todo.id} todo={todo} showDate={showDate} />
-            ))}
-          </SortableContext>
-        </DndContext>
-
-        {showAddForm && <AddTodoForm />}
-
-        {done.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setDoneOpen((v) => !v)}
-              className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-[var(--text-faint)] hover:text-[var(--text-subtle)]"
-            >
-              <span>{doneOpen ? "▾" : "▸"}</span>
-              <span>완료 {done.length}개</span>
-            </button>
-            {doneOpen && (
-              <div className="flex flex-col gap-2">
-                {done.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} showDate={showDate} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {overdue.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setOverdueOpen((v) => !v)}
-              className="mb-2 flex cursor-pointer items-center gap-1 text-xs text-[var(--text-faint)] hover:text-[var(--text-subtle)]"
-            >
-              <span>{overdueOpen ? "▾" : "▸"}</span>
-              <span>미완료 {overdue.length}개</span>
-            </button>
-            {overdueOpen && (
-              <div className="flex flex-col gap-2">
-                {overdue.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} showDate={showDate} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {filtered.length === 0 && (
-          <div className="py-16 text-center">
-            <p className="mb-3 text-3xl">✅</p>
-            <p className="text-sm text-[var(--text-subtle)]">할일이 없어요!</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  function CalendarView() {
-    return (
-      <div className="flex flex-col gap-4">
-        <Calendar
-          todos={todos ?? []}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-        />
-        {selectedDate && (
-          <div>
-            <p className="mb-2 text-xs text-[var(--text-subtle)]">
-              {format(selectedDate, "M월 d일", { locale: ko })} 할일{" "}
-              {calendarTodos.length}개
-            </p>
-            {calendarTodos.length === 0 ? (
-              <p className="py-6 text-center text-sm text-[var(--text-faint)]">
-                할일이 없어요
-              </p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {calendarTodos.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="flex w-full flex-col pb-2 md:h-full md:pb-0">
-      {/* 헤더 */}
       <div className="mt-4 mb-6 shrink-0">
         <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>
-        <p className="mt-1 text-sm text-[var(--text-subtle)]">{todayLabel}</p>
+        <p className="mt-1 text-sm text-(--text-subtle)">{todayLabel}</p>
       </div>
 
       {isLoading ? (
-        <p className="py-12 text-center text-sm text-[var(--text-subtle)]">
+        <p className="py-12 text-center text-sm text-(--text-subtle)">
           불러오는 중...
         </p>
       ) : (
@@ -298,7 +306,7 @@ export default function TodosPage() {
                   className={`flex-1 cursor-pointer rounded-lg py-2 text-xs transition-colors ${
                     mobileView === tab.value
                       ? "bg-[var(--accent)] font-medium text-white"
-                      : "text-[var(--text-subtle)] hover:text-[var(--text)]"
+                      : "text-(--text-subtle) hover:text-[var(--text)]"
                   }`}
                 >
                   {tab.label}
@@ -306,7 +314,12 @@ export default function TodosPage() {
               ))}
             </div>
             {mobileView === "calendar" ? (
-              <CalendarView />
+              <CalendarView
+                todos={todos ?? []}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                calendarTodos={calendarTodos}
+              />
             ) : (
               <TodoList
                 undone={mobileUndone}
@@ -314,6 +327,8 @@ export default function TodosPage() {
                 filtered={mobileFiltered}
                 showAddForm
                 showOverdue={mobileView !== "today"}
+                sensors={sensors}
+                onDragEnd={makeDragHandler(mobileUndone)}
               />
             )}
           </div>
@@ -325,15 +340,15 @@ export default function TodosPage() {
               style={{ width: `${leftWidth}%` }}
               className="min-w-0 overflow-y-auto pr-4"
             >
-              <p className="mb-4 text-sm font-semibold text-[var(--text)]">
-                오늘
-              </p>
+              <p className="mb-4 text-sm font-semibold text-[var(--text)]">오늘</p>
               <TodoList
                 undone={todayUndone}
                 done={todayDone}
                 filtered={todayTodos}
                 showAddForm
                 defaultDoneOpen
+                sensors={sensors}
+                onDragEnd={makeDragHandler(todayUndone)}
               />
             </div>
 
@@ -377,7 +392,7 @@ export default function TodosPage() {
                     className={`flex-1 cursor-pointer rounded-lg py-2 text-sm transition-colors ${
                       rightView === tab.value
                         ? "bg-[var(--accent)] font-medium text-white"
-                        : "text-[var(--text-subtle)] hover:text-[var(--text)]"
+                        : "text-(--text-subtle) hover:text-[var(--text)]"
                     }`}
                   >
                     {tab.label}
@@ -385,7 +400,12 @@ export default function TodosPage() {
                 ))}
               </div>
               {rightView === "calendar" ? (
-                <CalendarView />
+                <CalendarView
+                  todos={todos ?? []}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  calendarTodos={calendarTodos}
+                />
               ) : (
                 <TodoList
                   undone={rightUndone}
@@ -393,6 +413,8 @@ export default function TodosPage() {
                   filtered={rightFiltered}
                   showDate
                   showOverdue
+                  sensors={sensors}
+                  onDragEnd={makeDragHandler(rightUndone)}
                 />
               )}
             </div>
