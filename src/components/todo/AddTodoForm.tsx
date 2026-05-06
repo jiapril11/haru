@@ -127,6 +127,7 @@ export default function AddTodoForm() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
                 className={dateInputClass}
               />
               <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
@@ -139,6 +140,7 @@ export default function AddTodoForm() {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
+                onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
                 className={dateInputClass}
               />
               <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
@@ -152,6 +154,7 @@ export default function AddTodoForm() {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
               className={dateInputClass}
             />
             <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
