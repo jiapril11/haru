@@ -17,6 +17,24 @@ const prioritySelectStyle = {
   low: "border-blue-400 text-blue-400 focus:ring-blue-400",
 };
 
+const CalendarIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
 type Props = {
   todo: Todo;
   showDate?: boolean;
@@ -92,27 +110,51 @@ export default function TodoItem({ todo, showDate = false }: Props) {
             </select>
             {isRange ? (
               <>
-                <input
-                  type="date"
-                  value={editStartDate}
-                  onChange={(e) => setEditStartDate(e.target.value)}
-                  className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                />
+                <label className="relative cursor-pointer">
+                  <input
+                    type="date"
+                    value={editStartDate}
+                    onChange={(e) => setEditStartDate(e.target.value)}
+                    onClick={(e) =>
+                      (e.currentTarget as HTMLInputElement).showPicker?.()
+                    }
+                    className="rounded-lg bg-[var(--surface2)] py-1 pl-2 pr-7 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+                    <CalendarIcon />
+                  </div>
+                </label>
                 <span className="text-xs text-[var(--text-faint)]">~</span>
+                <label className="relative cursor-pointer">
+                  <input
+                    type="date"
+                    value={editDueDate}
+                    onChange={(e) => setEditDueDate(e.target.value)}
+                    onClick={(e) =>
+                      (e.currentTarget as HTMLInputElement).showPicker?.()
+                    }
+                    className="rounded-lg bg-[var(--surface2)] py-1 pl-2 pr-7 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+                    <CalendarIcon />
+                  </div>
+                </label>
+              </>
+            ) : (
+              <label className="relative cursor-pointer">
                 <input
                   type="date"
                   value={editDueDate}
                   onChange={(e) => setEditDueDate(e.target.value)}
-                  className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  onClick={(e) =>
+                    (e.currentTarget as HTMLInputElement).showPicker?.()
+                  }
+                  className="rounded-lg bg-[var(--surface2)] py-1 pl-2 pr-7 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 />
-              </>
-            ) : (
-              <input
-                type="date"
-                value={editDueDate}
-                onChange={(e) => setEditDueDate(e.target.value)}
-                className="rounded-lg bg-[var(--surface2)] px-2 py-1 text-xs text-[var(--text)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              />
+                <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-(--text-muted)">
+                  <CalendarIcon />
+                </div>
+              </label>
             )}
             <div className="ml-auto flex gap-2">
               <button

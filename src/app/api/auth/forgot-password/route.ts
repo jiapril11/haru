@@ -29,19 +29,9 @@ export async function POST(request: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
-  // admin API로 이메일 존재 여부 확인
-  const { data, error } = await supabase.auth.admin.listUsers();
-  if (error) {
-    console.error("[forgot-password] listUsers error:", error);
-    return NextResponse.json({ error: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." }, { status: 500 });
-  }
-
-  const exists = data.users.some((u) => u.email === email);
-  if (!exists) {
-    return NextResponse.json({ error: "해당 이메일로 가입된 계정이 없습니다." }, { status: 404 });
-  }
-
-  // 존재하면 재설정 메일 발송
+  // 이메일 존재 여부를 먼저 조회하는 방식은 느리고(전체 유저 조회),
+  // 사용자 열거(user enumeration) 문제도 생길 수 있어 여기서는
+  // 재설정 메일 발송만 수행합니다.
   const origin = request.nextUrl.origin;
   const safeRedirectTo = `${origin}${redirectTo}`;
   const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
