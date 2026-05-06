@@ -39,8 +39,10 @@ export async function proxy(request: NextRequest) {
   }
 
   const isResetPage = pathname === "/auth/reset-password";
+  const isAuthCallbackPage = pathname === "/auth/callback";
 
-  if (user && isAuthPage && !isResetPage) {
+  // 비밀번호 재설정/인증 콜백은 로그인 상태여도 접근 허용
+  if (user && isAuthPage && !isResetPage && !isAuthCallbackPage) {
     return NextResponse.redirect(new URL("/todos", request.url));
   }
 
