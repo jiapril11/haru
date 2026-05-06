@@ -66,33 +66,56 @@ export default function LoginPage() {
         return;
       }
 
-      const res = await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          redirectTo: "/auth/callback?next=/auth/reset-password",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        const msg =
-          typeof data.error === "string" &&
-          data.error.toLowerCase().includes("rate limit")
-            ? "이메일 전송 한도를 초과했습니다. 1시간 후에 다시 시도해주세요."
-            : data.error;
-        setError(msg);
-      } else {
-        incrementResetCount();
-        const { count: newCount } = getResetCount();
-        const remaining = RESET_LIMIT - newCount;
-        setMessage(
-          remaining > 0
-            ? `비밀번호 재설정 링크를 이메일로 보냈습니다. (남은 횟수: ${remaining}회)`
-            : "비밀번호 재설정 링크를 이메일로 보냈습니다. 1시간 후 다시 요청할 수 있습니다.",
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const res = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            redirectTo: "/auth/callback?next=/auth/reset-password",
+          }),
+          signal: controller.signal,
+        });
+
+        let data: any = {};
+        try {
+          data = await res.json();
+        } catch {
+          // 응답 본문 파싱 실패는 네트워크/서버 문제 가능성이 있어서 기본 메시지로 처리
+          data = {};
+        }
+
+        if (!res.ok) {
+          const msg =
+            typeof data.error === "string" &&
+            data.error.toLowerCase().includes("rate limit")
+              ? "이메일 전송 한도를 초과했습니다. 1시간 후에 다시 시도해주세요."
+              : data.error;
+          setError(msg || "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        } else {
+          incrementResetCount();
+          const { count: newCount } = getResetCount();
+          const remaining = RESET_LIMIT - newCount;
+          setMessage(
+            remaining > 0
+              ? `비밀번호 재설정 링크를 이메일로 보냈습니다. (남은 횟수: ${remaining}회)`
+              : "비밀번호 재설정 링크를 이메일로 보냈습니다. 1시간 후 다시 요청할 수 있습니다.",
+          );
+        }
+      } catch (err: any) {
+        const isAbort = err?.name === "AbortError";
+        setError(
+          isAbort
+            ? "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
+            : "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.",
         );
+      } finally {
+        window.clearTimeout(timeoutId);
+        setLoading(false);
       }
-      setLoading(false);
       return;
     }
 
