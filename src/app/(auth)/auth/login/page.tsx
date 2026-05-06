@@ -75,7 +75,9 @@ export default function LoginPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email,
-            redirectTo: "/auth/callback?next=/auth/reset-password",
+            // Supabase recovery는 fragment(#access_token, #refresh_token) 형태로 돌아오는 경우가 많음.
+            // reset-password 페이지가 hash 토큰을 직접 처리하므로 callback redirect를 거치지 않도록 한다.
+            redirectTo: "/auth/reset-password",
           }),
           signal: controller.signal,
         });

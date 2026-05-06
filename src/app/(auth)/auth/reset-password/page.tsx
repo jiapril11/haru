@@ -5,6 +5,61 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+function getKoreanResetErrorMessage(message: string) {
+  const normalized = message.toLowerCase();
+
+  // 비밀번호 재사용 제한
+  if (
+    normalized.includes("new password should be different from the old password") ||
+    normalized.includes("same as the old")
+  ) {
+    return "새 비밀번호는 기존 비밀번호와 다르게 설정해주세요.";
+  }
+
+  // 비밀번호 정책
+  if (
+    normalized.includes("password should be at least") ||
+    normalized.includes("weak password") ||
+    normalized.includes("password is too weak")
+  ) {
+    return "비밀번호는 최소 6자 이상이어야 합니다.";
+  }
+
+  // 토큰/링크 문제
+  if (
+    (normalized.includes("invalid") && normalized.includes("token")) ||
+    normalized.includes("expired") ||
+    normalized.includes("jwt") ||
+    normalized.includes("otp expired") ||
+    normalized.includes("token has expired")
+  ) {
+    return "링크가 만료되었거나 유효하지 않습니다. 다시 요청해주세요.";
+  }
+
+  // 인증 세션 문제
+  if (
+    normalized.includes("auth session missing") ||
+    normalized.includes("session not found") ||
+    normalized.includes("invalid session")
+  ) {
+    return "인증 세션이 유효하지 않습니다. 비밀번호 재설정 링크를 다시 요청해주세요.";
+  }
+
+  // 요청 제한/일시적 장애
+  if (normalized.includes("rate limit") || normalized.includes("too many requests")) {
+    return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
+  }
+  if (
+    normalized.includes("network") ||
+    normalized.includes("fetch") ||
+    normalized.includes("timeout")
+  ) {
+    return "네트워크가 불안정합니다. 잠시 후 다시 시도해주세요.";
+  }
+
+  return "비밀번호 변경에 실패했습니다. 잠시 후 다시 시도해주세요.";
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -71,7 +126,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (error) {
-      setError(error.message);
+      setError(getKoreanResetErrorMessage(error.message));
     } else {
       await supabase.auth.signOut();
       router.push("/auth/login");
