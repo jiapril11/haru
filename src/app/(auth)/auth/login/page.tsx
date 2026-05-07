@@ -47,6 +47,26 @@ export default function LoginPage() {
     return `${minutes}분`;
   }
 
+  function getForgotPasswordErrorMessage(payload: unknown) {
+    const data = payload as { error?: unknown; error_code?: unknown };
+    const code =
+      typeof data?.error_code === "string" ? data.error_code : undefined;
+    const rawError = typeof data?.error === "string" ? data.error : undefined;
+    const normalized = rawError?.toLowerCase() ?? "";
+
+    if (code === "RATE_LIMIT" || normalized.includes("rate limit")) {
+      return "이메일 전송 한도를 초과했습니다. 1시간 후에 다시 시도해주세요.";
+    }
+    if (code === "SERVER_CONFIG_MISSING") {
+      return "서버 설정이 올바르지 않습니다. 관리자에게 문의해주세요.";
+    }
+    if (code === "REDIRECT_NOT_ALLOWED") {
+      return "리다이렉트 URL 설정이 올바르지 않습니다. 잠시 후 다시 시도해주세요.";
+    }
+    if (rawError) return rawError;
+    return "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.";
+  }
+
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     setError("");
@@ -91,12 +111,7 @@ export default function LoginPage() {
         }
 
         if (!res.ok) {
-          const msg =
-            typeof data.error === "string" &&
-            data.error.toLowerCase().includes("rate limit")
-              ? "이메일 전송 한도를 초과했습니다. 1시간 후에 다시 시도해주세요."
-              : data.error;
-          setError(msg || "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.");
+          setError(getForgotPasswordErrorMessage(data));
         } else {
           incrementResetCount();
           const { count: newCount } = getResetCount();

@@ -54,7 +54,7 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => setBaseDate(subMonths(baseDate, 1))}
-          className="px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
+          className="cursor-pointer px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
         >
           ←
         </button>
@@ -63,7 +63,7 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
         </h2>
         <button
           onClick={() => setBaseDate(addMonths(baseDate, 1))}
-          className="px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
+          className="cursor-pointer px-2 text-[var(--text-subtle)] transition-colors hover:text-[var(--text)]"
         >
           →
         </button>
@@ -89,7 +89,7 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
             <button
               key={day.toISOString()}
               onClick={() => onSelectDate(day)}
-              className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 transition-colors ${
+              className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg py-1.5 transition-colors ${
                 isSelected
                   ? "bg-[#e94560]"
                   : isToday(day)
@@ -97,7 +97,7 @@ export default function Calendar({ todos, selectedDate, onSelectDate }: Props) {
                     : isThisWeekDay && isCurrentMonth
                       ? "bg-[var(--border)]"
                       : ""
-              } ${!isCurrentMonth ? "opacity-25" : "hover:bg-[var(--border)]"}`}
+              } ${!isCurrentMonth ? "opacity-25" : isSelected || isToday(day) ? "" : "hover:bg-[var(--border)]"}`}
             >
               <span
                 className={`text-xs ${

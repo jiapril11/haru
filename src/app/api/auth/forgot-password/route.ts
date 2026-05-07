@@ -34,10 +34,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
   }
 
-  const supabase = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return NextResponse.json(
+      {
+        error: "서버 설정이 올바르지 않습니다. 관리자에게 문의해주세요.",
+        error_code: "SERVER_CONFIG_MISSING",
+      },
+      { status: 500 },
+    );
+  }
+
+  const supabase = createAdminClient(supabaseUrl, serviceRoleKey);
 
   // 이메일 존재 여부를 먼저 조회하는 방식은 느리고(전체 유저 조회),
   // 사용자 열거(user enumeration) 문제도 생길 수 있어 여기서는
@@ -56,14 +65,24 @@ export async function POST(request: NextRequest) {
   });
   if (resetError) {
     console.error("[forgot-password] resetPasswordForEmail error:", resetError);
-    const isRateLimit = resetError.message.toLowerCase().includes("rate limit");
+    const normalized = resetError.message.toLowerCase();
+    const isRateLimit = normalized.includes("rate limit");
+    const isRedirectNotAllowed =
+      normalized.includes("redirect") && normalized.includes("not allowed");
+
+    const errorCode = isRateLimit
+      ? "RATE_LIMIT"
+      : isRedirectNotAllowed
+        ? "REDIRECT_NOT_ALLOWED"
+        : "SUPABASE_RESET_FAILED";
+
     return NextResponse.json(
       {
-        error: isRateLimit
-          ? "rate limit exceeded"
-          : process.env.NODE_ENV === "production"
+        error:
+          process.env.NODE_ENV === "production"
             ? "이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요."
             : resetError.message,
+        error_code: errorCode,
       },
       { status: 500 },
     );
