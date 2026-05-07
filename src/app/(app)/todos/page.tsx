@@ -287,7 +287,7 @@ export default function TodosPage() {
     <div className="flex w-full flex-col pb-2 md:h-full md:pb-0">
       <div className="mt-4 mb-6 shrink-0">
         <h1 className="text-xl font-bold text-[var(--text)]">할일</h1>
-        <p className="mt-1 text-sm text-(--text-subtle)">{todayLabel}</p>
+        <p className="mt-1 text-sm text-(--text-subtle) md:hidden">{todayLabel}</p>
       </div>
 
       {isLoading ? (
@@ -340,7 +340,10 @@ export default function TodosPage() {
               style={{ width: `${leftWidth}%` }}
               className="min-w-0 overflow-y-auto pr-4"
             >
-              <p className="mb-4 text-sm font-semibold text-[var(--text)]">오늘</p>
+              <div className="mb-4 flex items-baseline gap-2 py-3">
+                <p className="text-base font-bold text-[var(--text)]">오늘</p>
+                <p className="text-sm text-(--text-subtle)">{todayLabel}</p>
+              </div>
               <TodoList
                 undone={todayUndone}
                 done={todayDone}
