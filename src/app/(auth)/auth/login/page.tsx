@@ -67,6 +67,23 @@ export default function LoginPage() {
     return "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.";
   }
 
+  async function handleDemoLogin() {
+    const email = process.env.NEXT_PUBLIC_DEMO_EMAIL;
+    const password = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
+    if (!email || !password) return;
+
+    setError("");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError("데모 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } else {
+      router.push("/todos");
+      router.refresh();
+    }
+    setLoading(false);
+  }
+
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     setError("");
@@ -290,6 +307,23 @@ export default function LoginPage() {
             </button>
           )}
         </form>
+        {mode === "login" && process.env.NEXT_PUBLIC_DEMO_EMAIL && (
+          <>
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[var(--border)]" />
+              <span className="text-xs text-[var(--text-faint)]">또는</span>
+              <div className="h-px flex-1 bg-[var(--border)]" />
+            </div>
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="w-full cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--bg)] py-2.5 text-sm text-[var(--text-subtle)] transition-colors hover:border-[var(--accent)] hover:text-[var(--text)] disabled:opacity-50"
+            >
+              데모로 체험하기
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
