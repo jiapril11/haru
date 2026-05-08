@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X, Download } from "lucide-react";
 
@@ -18,7 +17,6 @@ export default function Gnb() {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [iosGuideOpen, setIosGuideOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const supabase = createClient();
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -58,7 +56,7 @@ export default function Gnb() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    router.refresh();
+    window.location.href = "/auth/login";
   }
 
   async function handleInstall() {

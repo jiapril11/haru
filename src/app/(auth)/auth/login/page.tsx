@@ -2,11 +2,9 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
@@ -78,8 +76,7 @@ export default function LoginPage() {
     if (error) {
       setError("데모 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } else {
-      router.push("/todos");
-      router.refresh();
+      window.location.href = "/todos";
     }
     setLoading(false);
   }
@@ -161,8 +158,7 @@ export default function LoginPage() {
       if (error) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
       } else {
-        router.push("/todos");
-        router.refresh();
+        window.location.href = "/todos";
       }
     } else {
       if (password.length < 6) {

@@ -1,15 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LogoutButton() {
-  const router = useRouter();
   const supabase = createClient();
+  const queryClient = useQueryClient();
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    router.refresh();
+    queryClient.clear();
+    window.location.href = "/auth/login";
   }
 
   return (
