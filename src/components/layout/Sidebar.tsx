@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useIsDemo } from "@/hooks/useIsDemo";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -13,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 const menus = [
   { label: "할일", href: "/todos", icon: "✅" },
   { label: "북마크", href: "/bookmarks", icon: "🔖" },
+  { label: "설정", href: "/settings", icon: "⚙️" },
 ];
 
 interface SidebarProps {
@@ -22,6 +24,8 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const isDemo = useIsDemo();
+  const visibleMenus = menus.filter((m) => !(isDemo && m.href === "/settings"));
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const isInstalled =
     typeof window !== "undefined" &&
@@ -56,7 +60,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       }`}
     >
       <nav className="flex flex-1 flex-col gap-1 p-2">
-        {menus.map((menu) => (
+        {visibleMenus.map((menu) => (
           <Link
             key={menu.href}
             href={menu.href}

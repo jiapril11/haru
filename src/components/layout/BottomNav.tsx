@@ -2,21 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useIsDemo } from "@/hooks/useIsDemo";
 
 const menus = [
   { label: "할일", href: "/todos", icon: "✅" },
   { label: "북마크", href: "/bookmarks", icon: "🔖" },
+  { label: "설정", href: "/settings", icon: "⚙️" },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const isDemo = useIsDemo();
+  const visibleMenus = menus.filter((m) => !(isDemo && m.href === "/settings"));
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] flex items-center md:hidden z-50"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      {menus.map((menu) => (
+      {visibleMenus.map((menu) => (
         <Link
           key={menu.href}
           href={menu.href}
